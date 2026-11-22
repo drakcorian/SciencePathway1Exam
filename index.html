@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#2E8B57">
+<title>Year 10 Science Exam Revision</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+:root{color-scheme:light}
+html,body{min-height:100%}
+body{background:var(--bg);transition:background .3s;min-height:100vh;display:flex;flex-direction:column;color:#222}
+
+#bar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(0,0,0,0.14);flex-shrink:0}
+#prog-wrap{flex:1;height:6px;background:rgba(255,255,255,0.3);border-radius:3px;overflow:hidden}
+#prog{height:100%;width:0%;background:#fff;border-radius:3px;transition:width .3s}
+#lv{background:rgba(0,0,0,0.2);color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px;white-space:nowrap}
+#teacher-toggle{background:rgba(0,0,0,0.2);color:#fff;border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;cursor:pointer}
+
+#quiz-view{flex:1;display:flex;flex-direction:column}
+#retry-bar{background:#c0392b;color:#fff;font-size:13px;font-weight:600;text-align:center;padding:6px;display:none}
+#stage{flex:1;padding:12px;display:flex;justify-content:center;align-items:flex-start}
+#card{background:#fff;border-radius:16px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.18)}
+
+#qhead{padding:22px 18px 14px;text-align:center}
+#badge{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 10px;border-radius:20px;margin-bottom:8px}
+#qtext{font-size:21px;font-weight:700;color:#111;line-height:1.3}
+#qtext.mid{font-size:17px}
+#qtext.long{font-size:15px;font-weight:600}
+#qsub{font-size:12px;color:#999;margin-top:6px}
+
+#grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:#d0d0d0;border-top:2px solid #d0d0d0}
+#grid.wide{grid-template-columns:1fr}
+#grid.wide .opt{min-height:0}
+.opt{background:#f0f0f0;padding:16px 12px;display:flex;align-items:flex-start;gap:8px;min-height:90px;cursor:pointer}
+.opt:active{background:#e0e0e0}
+.opt.ok{background:#d4edda}.opt.bad{background:#f8d7da}.opt.show{background:#d4edda}
+.num{width:20px;height:20px;border-radius:4px;background:#ccc;color:#555;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.opt.ok .num,.opt.show .num{background:#28a745;color:#fff}
+.opt.bad .num{background:#dc3545;color:#fff}
+.txt{font-size:14px;color:#333;line-height:1.35;min-width:0;overflow-wrap:anywhere}
+.opt.ok .txt,.opt.show .txt{color:#155724;font-weight:600}
+.opt.bad .txt{color:#721c24}
+
+#frow{padding:10px 14px;display:flex;align-items:flex-start;justify-content:space-between;min-height:48px;border-top:1px solid #eee;gap:8px}
+#fb-wrap{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+#fb{font-size:13px;font-weight:600}
+#fnote{font-size:13px;color:#555;line-height:1.5;display:none;padding-top:2px}
+.fbok{color:#155724}.fbbad{color:#721c24}
+#nxt{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-size:14px;font-weight:700;cursor:pointer;display:none;-webkit-appearance:none;flex-shrink:0;align-self:center}
+
+#stats{display:flex;border-top:1px solid #eee}
+.st{flex:1;text-align:center;padding:9px 2px;border-right:1px solid #eee}
+.st:last-child{border-right:none}
+.sv{font-size:17px;font-weight:700;color:#333}
+.sl{font-size:10px;color:#999;margin-top:2px}
+
+#level-summary,#done{display:none;flex-direction:column;align-items:center;padding:28px 18px;text-align:center}
+#level-summary h2,#done h2{font-size:22px;font-weight:700;color:#222;margin-bottom:6px}
+#done p{font-size:13px;color:#777;margin-bottom:18px}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%;margin-bottom:20px}
+.dc{background:#f5f5f5;border-radius:10px;padding:12px}
+.dv{font-size:22px;font-weight:700;color:#333}
+.dl{font-size:11px;color:#999;margin-top:2px}
+.dbtn{display:block;width:100%;border:none;border-radius:11px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;-webkit-appearance:none}
+.dbtn:last-child{margin-bottom:0}
+.teal{background:var(--accent);color:#fff}
+.green{background:#28a745;color:#fff}
+.lv-badge{font-size:48px;margin-bottom:8px}
+.lv-tag{display:inline-block;background:var(--accent);color:#fff;font-size:13px;font-weight:700;padding:4px 16px;border-radius:20px;margin-bottom:12px}
+.unlock-msg{font-size:13px;color:#155724;font-weight:600;margin-bottom:16px;padding:10px 14px;background:#d4edda;border-radius:10px;width:100%}
+
+#levels{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding:0 12px 14px}
+.lvjump{background:rgba(255,255,255,0.18);color:#fff;border:none;border-radius:20px;padding:5px 11px;font-size:12px;font-weight:700;cursor:pointer}
+.lvjump.on{background:#fff;color:var(--accent)}
+
+button:focus-visible,.opt:focus-visible{outline:3px solid var(--dark);outline-offset:2px}
+
+/* teacher view */
+#teacher-view{display:none;flex:1;flex-direction:column;background:#f7f7f7}
+#tv-toolbar{background:#fff;border-bottom:1px solid #eee;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0;flex-wrap:wrap}
+#tv-toolbar h2{font-size:16px;font-weight:700;color:#222}
+#tv-toolbar-right{display:flex;gap:8px;flex-wrap:wrap}
+.tv-btn{border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;-webkit-appearance:none}
+.tv-btn.green{background:#28a745;color:#fff}
+.tv-btn.gray{background:#eee;color:#555}
+#tv-scroll{flex:1;overflow-y:auto;padding:12px 14px}
+.qcard{background:#fff;border-radius:12px;margin-bottom:12px;overflow:hidden;border:1px solid #e8e8e8}
+.qcard-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f9f9f9;border-bottom:1px solid #eee;cursor:pointer;gap:8px}
+.qcard-num{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0}
+.qcard-preview{font-size:13px;color:#555;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.qcard-lv{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--tint);color:var(--accent);flex-shrink:0}
+.qcard-del{background:#f8d7da;border:none;border-radius:6px;padding:5px 10px;font-size:12px;font-weight:700;color:#721c24;cursor:pointer;flex-shrink:0}
+.qcard-body{padding:12px 14px;display:none;flex-direction:column;gap:10px}
+.qcard-body.open{display:flex}
+.field-label{font-size:11px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.field-input{width:100%;padding:9px 11px;border:1.5px solid #e0e0e0;border-radius:8px;font-size:14px;background:#fff;color:#222;outline:none;-webkit-appearance:none;font-family:inherit}
+.field-input:focus{border-color:var(--bg)}
+textarea.field-input{resize:vertical;min-height:60px;line-height:1.4}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{border:1.5px solid #e0e0e0;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:#888;cursor:pointer;background:#fff}
+.pill.active{border-color:var(--bg);background:var(--tint);color:var(--accent)}
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hint{font-size:12px;color:#888}
+#add-btn{display:block;width:100%;background:#fff;border:2px dashed var(--bg);border-radius:10px;padding:13px;font-size:14px;font-weight:700;color:var(--accent);cursor:pointer;text-align:center;margin-top:4px;margin-bottom:16px}
+
+:root{--bg:#2E8B57;--accent:#1F6B42;--dark:#123F27;--tint:#E3F4EA}
+#badge.b1{background:#E8F0FE;color:#1F4E9C}
+#badge.b2{background:#FDEBF3;color:#9B2C5E}
+#badge.b3{background:#E1F5EE;color:#0F6E56}
+#badge.b4{background:#FFF4DC;color:#8A5A00}
+#badge.b5{background:#EFE9FB;color:#5B3BA6}
+#badge.b6{background:#F1F1F1;color:#444}
+#subjects{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:10px 12px 2px;max-width:544px;margin:0 auto;width:100%}
+.subj{background:rgba(255,255,255,0.18);color:#fff;border:none;border-radius:12px;padding:6px 2px;font-size:12px;font-weight:700;cursor:pointer;-webkit-appearance:none;display:flex;flex-direction:column;align-items:center;gap:2px;line-height:1.1}
+.subj .se{font-size:18px}
+.subj.on{background:#fff;color:var(--accent)}
+#lvname{color:#fff;text-align:center;font-size:14px;font-weight:700;padding:8px 12px 0;opacity:.95}
+#empty{display:none;padding:28px 18px;text-align:center;color:#555;font-size:14px}
+</style>
+</head>
+<body>
+
+
+<div id="bar">
+  <div id="prog-wrap"><div id="prog"></div></div>
+  <div id="lv">Biology · Level 1</div>
+  <button id="teacher-toggle">✏ Teacher</button>
+</div>
+
+<div id="quiz-view">
+  <div id="subjects" role="group" aria-label="Choose a subject"></div>
+  <div id="lvname"></div>
+  <div id="retry-bar">🔁 Retesting cards you missed</div>
+  <div id="stage">
+    <div id="card">
+      <div id="qhead">
+        <div id="badge" class="b-form">loading</div>
+        <div id="qtext">Getting ready…</div>
+        <div id="qsub"></div>
+      </div>
+      <div id="grid">
+        <div class="opt" id="o0" tabindex="0"><div class="num">1</div><div class="txt"></div></div>
+        <div class="opt" id="o1" tabindex="0"><div class="num">2</div><div class="txt"></div></div>
+        <div class="opt" id="o2" tabindex="0"><div class="num">3</div><div class="txt"></div></div>
+        <div class="opt" id="o3" tabindex="0"><div class="num">4</div><div class="txt"></div></div>
+      </div>
+      <div id="frow">
+        <div id="fb-wrap">
+          <div id="fb"></div>
+          <div id="fnote"></div>
+        </div>
+        <button id="nxt">Next →</button>
+      </div>
+      <div id="stats">
+        <div class="st"><div class="sv" id="sc">0</div><div class="sl">correct</div></div>
+        <div class="st"><div class="sv" id="sr">0</div><div class="sl">retry</div></div>
+        <div class="st"><div class="sv" id="ss">0</div><div class="sl">streak 🔥</div></div>
+        <div class="st"><div class="sv" id="sa">—</div><div class="sl">accuracy</div></div>
+      </div>
+
+      <div id="level-summary">
+        <div class="lv-badge" id="ls-emoji">⭐</div>
+        <div class="lv-tag" id="ls-tag">Level 1 Complete!</div>
+        <h2 id="ls-title">Nice work!</h2>
+        <div class="dg">
+          <div class="dc"><div class="dv" id="ls-c">0</div><div class="dl">correct</div></div>
+          <div class="dc"><div class="dv" id="ls-w">0</div><div class="dl">wrong</div></div>
+          <div class="dc"><div class="dv" id="ls-acc">—</div><div class="dl">accuracy</div></div>
+          <div class="dc"><div class="dv" id="ls-xp">0</div><div class="dl">XP earned</div></div>
+        </div>
+        <div class="unlock-msg" id="ls-unlock"></div>
+        <button class="dbtn green" id="ls-next">Next Level →</button>
+        <button class="dbtn teal" id="ls-retry">Retry this level</button>
+      </div>
+
+      <div id="empty">This level has no questions yet. Add some with ✏ Teacher.</div>
+
+      <div id="done">
+        <div style="font-size:44px;margin-bottom:8px">🏆</div>
+        <h2>All levels complete!</h2>
+        <p id="dsub"></p>
+        <div class="dg">
+          <div class="dc"><div class="dv" id="dc1">0</div><div class="dl">correct</div></div>
+          <div class="dc"><div class="dv" id="dc2">0</div><div class="dl">wrong</div></div>
+          <div class="dc"><div class="dv" id="dc3">—</div><div class="dl">accuracy</div></div>
+          <div class="dc"><div class="dv" id="dc4">0</div><div class="dl">XP earned</div></div>
+        </div>
+        <button class="dbtn teal" id="d-again">Play this subject again from Level 1</button>
+      </div>
+    </div>
+  </div>
+  <div id="levels"></div>
+</div>
+
+<div id="teacher-view">
+  <div id="tv-toolbar">
+    <h2 id="tv-title">✏ Question Editor</h2>
+    <div id="tv-toolbar-right">
+      <button class="tv-btn gray" id="tv-reset">Restore defaults</button>
+      <button class="tv-btn gray" id="tv-cancel">Cancel</button>
+      <button class="tv-btn green" id="tv-save">Save &amp; Play</button>
+    </div>
+  </div>
+  <div id="tv-scroll">
+    <div id="qlist"></div>
+    <button id="add-btn">+ Add question</button>
+  </div>
+</div>
+
+<script>
+// Year 10 Science, Semester 2 exam revision (Willetton SHS, Task 10)
+// Four subjects: Biology, Chemistry, Physics, Science Inquiry. Each has its own levels.
+// Question fields: s = subject, lv = level, t = type (badge), q = question, a = correct answer, x = three wrong answers, note = explanation.
+// "term" cards flip: sometimes show the term (pick the definition), sometimes the definition (pick the term). Wrong options come from the same subject's terms.
+var SUBJECTS={"bio": {"name": "Biology", "emoji": "🧬", "bg": "#2E8B57", "accent": "#1F6B42", "dark": "#123F27", "tint": "#E3F4EA", "types": ["gen", "ped", "ns", "evo", "data", "term"], "levels": [{"emoji": "🧬", "title": "Genetics & Crosses"}, {"emoji": "👪", "title": "Pedigrees & Inheritance"}, {"emoji": "🦋", "title": "Natural Selection & Speciation"}, {"emoji": "🦴", "title": "Evidence for Evolution"}, {"emoji": "📊", "title": "Exam-Style Data"}, {"emoji": "📖", "title": "Terminology"}]}, "chem": {"name": "Chemistry", "emoji": "🧪", "bg": "#6B4FB8", "accent": "#55399C", "dark": "#2E1D63", "tint": "#EEE8FB", "types": ["rate", "coll", "part", "acid", "name", "term"], "levels": [{"emoji": "⏱️", "title": "Reaction Rates"}, {"emoji": "💥", "title": "Collision Theory & Energy"}, {"emoji": "⚛️", "title": "Particle Model"}, {"emoji": "🧪", "title": "Acids, Bases & Reactions"}, {"emoji": "🔤", "title": "Names, Formulas & Atoms"}, {"emoji": "📖", "title": "Terminology"}]}, "phys": {"name": "Physics", "emoji": "⚡", "bg": "#2F6DB5", "accent": "#1F5190", "dark": "#0F2E57", "tint": "#E4EEFA", "types": ["mot", "frc", "safe", "nrg", "term"], "levels": [{"emoji": "🏃", "title": "Motion Basics"}, {"emoji": "📈", "title": "Motion Equations & Graphs"}, {"emoji": "🧲", "title": "Forces & Newton's Laws"}, {"emoji": "🚗", "title": "Car Safety & Energy Transfer"}, {"emoji": "⚡", "title": "Energy, Work & Power"}, {"emoji": "📖", "title": "Terminology"}]}, "inq": {"name": "Science Inquiry", "short": "Inquiry", "emoji": "🔬", "bg": "#C2571D", "accent": "#9C4314", "dark": "#5A240A", "tint": "#FBEBE1", "types": ["var", "fair", "graph", "data", "term"], "levels": [{"emoji": "🎯", "title": "Hypotheses & Variables"}, {"emoji": "⚖️", "title": "Fair Tests & Reliability"}, {"emoji": "📊", "title": "Tables & Graphs"}, {"emoji": "🔍", "title": "Analysing Data & Conclusions"}, {"emoji": "📖", "title": "Terminology"}]}};
+var BADGES={"gen": ["b1", "genetics"], "ped": ["b2", "pedigrees"], "ns": ["b3", "natural selection"], "evo": ["b4", "evolution"], "data": ["b5", "data & analysis"], "rate": ["b1", "reaction rates"], "coll": ["b3", "collision theory"], "part": ["b4", "particles"], "acid": ["b2", "acids & bases"], "name": ["b5", "names & formulas"], "mot": ["b1", "motion"], "frc": ["b2", "forces"], "safe": ["b3", "car safety"], "nrg": ["b4", "energy"], "var": ["b1", "variables"], "fair": ["b2", "fair tests"], "graph": ["b3", "graphs"], "term": ["b6", "terminology"]};
+var DEFAULT_DATA=[
+  {"s": "bio", "lv": 1, "t": "gen", "q": "Heterozygous means an organism has…", "a": "Two different alleles for a gene (e.g. Bb)", "x": ["Two dominant alleles (BB)", "Two recessive alleles (bb)", "Only one allele"], "note": "Hetero = different. Homo = same."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "Where are genes found?", "a": "On chromosomes, in the nucleus", "x": ["In the cell membrane", "In the blood only", "In the cytoplasm only"], "note": "A gene is a section of DNA on a chromosome."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "How many chromosomes are in a normal human body cell, and in a sperm or egg?", "a": "46 in a body cell, 23 in a sperm or egg", "x": ["23 in a body cell, 46 in a sperm or egg", "46 in both", "23 in both"], "note": "Sex cells carry half, so fertilisation brings the number back to 46."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "Which scientist is called 'the father of genetics' for his work on pea plants?", "a": "Gregor Mendel", "x": ["Charles Darwin", "Isaac Newton", "Alfred Wallace"], "note": "Darwin and Wallace came up with natural selection."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "A mutation is best described as…", "a": "A sudden, permanent change in a gene or chromosome", "x": ["A small variation between organisms", "The type of cell division body cells do", "A change caused by exercise"], "note": "This is the exact wording from the practice exam."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "A mutation can only be passed on to offspring if it happens in…", "a": "Sex cells (sperm or eggs)", "x": ["Skin cells", "Any body cell", "Muscle cells"], "note": "Mutations in body cells (like skin cancer) aren't inherited."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "Tt × Tt. What is the expected genotype ratio of the offspring?", "a": "1 TT : 2 Tt : 1 tt", "x": ["3 TT : 1 tt", "1 TT : 1 tt", "All Tt"], "note": "Punnett square: TT, Tt, Tt, tt."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "Tt × Tt. What is the expected phenotype ratio (T = tall, t = short)?", "a": "3 tall : 1 short", "x": ["1 tall : 2 short", "1 tall : 1 short", "All tall"], "note": "TT and Tt are both tall, so 3 out of 4 are tall."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "In pea plants, green pods (G) are dominant over yellow pods (g). What percentage of offspring from Gg × gg will have yellow pods?", "a": "50%", "x": ["25%", "75%", "0%"], "note": "Gg × gg gives Gg, Gg, gg, gg. Two out of four are gg (yellow)."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "A homozygous dominant plant (TT) is crossed with a homozygous recessive plant (tt). The offspring will be…", "a": "All Tt, showing the dominant trait", "x": ["All tt", "Half TT and half tt", "1 TT : 2 Tt : 1 tt"], "note": "Every offspring gets T from one parent and t from the other."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "Two heterozygous mice (Bb × Bb) have 400 offspring. About how many would you expect to be bb?", "a": "100", "x": ["200", "300", "0"], "note": "bb is 1 out of 4 (25%). 25% of 400 = 100."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "Two heterozygous plants (Rr × Rr) have 200 offspring. About how many would you expect to be heterozygous (Rr)?", "a": "100", "x": ["50", "150", "200"], "note": "Rr is 2 out of 4 (50%). 50% of 200 = 100."},
+  {"s": "bio", "lv": 1, "t": "gen", "q": "A black guinea pig is crossed with a white one (bb). They have 5 black and 5 white babies. What is the black parent's genotype?", "a": "Bb", "x": ["BB", "bb", "Can't tell"], "note": "A BB parent would give all black babies. Getting white babies means the black parent carries b."},
+  {"s": "bio", "lv": 2, "t": "ped", "q": "In a pedigree chart, a shaded circle means…", "a": "A female who has the trait", "x": ["A male who has the trait", "An unaffected female", "A carrier male"], "note": "Circles = females, squares = males. Shaded = has the trait."},
+  {"s": "bio", "lv": 2, "t": "ped", "q": "In a pedigree, a horizontal line joining a square and a circle shows…", "a": "Two parents (a mating)", "x": ["Two siblings", "Twins", "A grandparent"], "note": "A vertical line goes down from it to their children."},
+  {"s": "bio", "lv": 2, "t": "ped", "q": "Two parents without a trait have a child with the trait. The trait must be…", "a": "Recessive, with both parents carriers", "x": ["Dominant", "Caused by the environment", "Only from the father"], "note": "Each parent passed on a hidden recessive allele."},
+  {"s": "bio", "lv": 2, "t": "ped", "q": "Two parents WITH a trait have a child WITHOUT it. The trait must be…", "a": "Dominant, with both parents heterozygous", "x": ["Recessive", "Not genetic", "Only from the mother"], "note": "If it were recessive, two affected (aa) parents could only have affected (aa) children."},
+  {"s": "bio", "lv": 2, "t": "ped", "q": "Blue eyes (b) are recessive. A blue-eyed mother (bb) and a brown-eyed father have 6 children, all brown-eyed. What is the father's most likely genotype?", "a": "BB", "x": ["Bb", "bb", "Can't be brown-eyed"], "note": "If he were Bb, you'd expect about half the children to have blue eyes. All brown suggests BB."},
+  {"s": "bio", "lv": 2, "t": "ped", "q": "A brown-eyed child has a blue-eyed (bb) mother. What is the child's genotype?", "a": "Bb", "x": ["BB", "bb", "Can't tell"], "note": "The child must have got b from the mother, and is brown-eyed, so the other allele is B."},
+  {"s": "bio", "lv": 2, "t": "ped", "q": "A trait that seems to skip a generation is most likely…", "a": "Recessive", "x": ["Dominant", "Caused by a virus", "Not inherited"], "note": "Carriers (Aa) don't show it, but can pass it on."},
+  {"s": "bio", "lv": 2, "t": "ped", "q": "A dominant trait usually…", "a": "Appears in every generation", "x": ["Skips generations", "Only appears in males", "Never appears in children"], "note": "An affected person must have at least one affected parent."},
+  {"s": "bio", "lv": 2, "t": "ped", "q": "Two carriers (Aa × Aa) have a child. What is the chance the child has the recessive condition?", "a": "25%", "x": ["50%", "75%", "100%"], "note": "Only aa shows the condition: 1 box out of 4."},
+  {"s": "bio", "lv": 2, "t": "ped", "q": "Which parent's sex chromosome decides whether a baby is a boy?", "a": "The father's, because only sperm can carry a Y", "x": ["The mother's, because eggs carry X", "Both equally", "Neither, it's random chance only"], "note": "Eggs always carry X. A sperm carrying Y gives XY (a boy)."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "What is the correct order of natural selection?", "a": "Variation → selection pressure → best suited survive → they reproduce → population changes", "x": ["Selection pressure → organisms decide to change → they reproduce", "Population changes → variation → survival", "Organisms try to adapt → they pass on the changes"], "note": "Individuals don't choose to change. The variation has to already be there."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "Which of these is NOT needed for natural selection?", "a": "Organisms trying to change to suit their environment", "x": ["Variation in the population", "A selection pressure", "Traits that can be inherited"], "note": "That's Lamarck's old (wrong) idea. Natural selection only works on variation that already exists."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "How did giraffes get long necks, according to Darwin?", "a": "Giraffes with longer necks reached more food, survived and had more offspring", "x": ["Giraffes stretched their necks and passed on longer necks", "Giraffes grew longer necks because they wanted to", "All giraffes slowly grew longer necks at the same time"], "note": "Stretching your neck doesn't change your genes. That was Lamarck's idea."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "In a snowy habitat, white rabbits become more common over many generations. Why?", "a": "White rabbits are camouflaged, so predators catch fewer of them and they reproduce more", "x": ["The snow turns the rabbits white", "Brown rabbits choose to move away", "The rabbits decide to grow white fur"], "note": "Predation is the selection pressure. White fur already existed in the population."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "Rabbits in Australia were hit with the myxoma virus. Over time, more rabbits became resistant. Why?", "a": "Rabbits that were already resistant survived and passed on their alleles", "x": ["The virus taught rabbits to be resistant", "Every rabbit became resistant after being infected", "Farmers bred resistant rabbits on purpose"], "note": "The virus was the selection pressure. This is natural selection happening in Australia."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "Insects become resistant to a pesticide over time because…", "a": "The few insects that were already resistant survive and breed", "x": ["The pesticide causes resistance mutations", "The insects learn to avoid it", "The pesticide gets weaker over time"], "note": "Same pattern as antibiotic resistance in bacteria."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "Which TWO things create variation in a population?", "a": "Mutation and sexual reproduction", "x": ["Natural selection and isolation", "Exercise and diet", "Speciation and evolution"], "note": "Mutation makes new alleles. Sexual reproduction mixes them into new combinations."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "A horse and a donkey can mate and produce a mule, but horses and donkeys are separate species. Why?", "a": "Mules are infertile, so they can't produce offspring", "x": ["Mules look different from both parents", "Horses and donkeys live in different places", "Mules are bigger than donkeys"], "note": "A species must produce FERTILE offspring."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "What are the three requirements for speciation, in order?", "a": "Variation, isolation, selection", "x": ["Isolation, mutation, extinction", "Selection, variation, isolation", "Mutation, migration, competition"], "note": "Exactly what the practice exam marking key asks for."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "Why is isolation needed for speciation?", "a": "It stops the groups interbreeding, so differences in one group don't spread to the other", "x": ["It makes the groups bigger", "It makes new mutations happen", "It stops natural selection"], "note": "Without isolation, interbreeding keeps mixing the populations back together."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "Two isolated groups of the same species slowly become different species because…", "a": "Different selection pressures act on each group over many generations", "x": ["They decide not to breed together", "Each group gets the same mutations", "They live for longer"], "note": "Eventually they can't produce fertile offspring together, even if they meet again."},
+  {"s": "bio", "lv": 3, "t": "ns", "q": "Drought is an example of…", "a": "An abiotic (physical) selection pressure", "x": ["A biotic (living) selection pressure", "A mutation", "Speciation"], "note": "Biotic pressures are living things, like predators, disease and competition."},
+  {"s": "bio", "lv": 4, "t": "evo", "q": "Which of these is a vestigial structure in snakes?", "a": "Small leftover hip (pelvic) bones", "x": ["Their fangs", "Their scales", "Their forked tongue"], "note": "Vestigial = left over from an ancestor that used it (here, one that had legs)."},
+  {"s": "bio", "lv": 4, "t": "evo", "q": "An emu has wings but can't fly. Its wings are…", "a": "Vestigial structures", "x": ["Analogous structures", "A new adaptation for flying", "A mutation that just happened"], "note": "They suggest emus came from flying ancestors."},
+  {"s": "bio", "lv": 4, "t": "evo", "q": "How are vestigial structures evidence of evolution?", "a": "They suggest the organism descended from an ancestor that used the structure", "x": ["They show the organism is still evolving that structure", "They prove organisms don't change", "They show the organism is unhealthy"], "note": "Practice exam answer: no current function + descended from an ancestor that used it + an example."},
+  {"s": "bio", "lv": 4, "t": "evo", "q": "A human arm, a bat wing and a whale flipper have the same bone layout. This suggests…", "a": "They share a common ancestor", "x": ["They all live in the same habitat", "They all do the same job", "They all evolved separately"], "note": "These are homologous structures."},
+  {"s": "bio", "lv": 4, "t": "evo", "q": "Archaeopteryx had feathers like a bird but teeth and a bony tail like a reptile. It's an example of a…", "a": "Transitional fossil", "x": ["Vestigial structure", "Living fossil", "Trace fossil"], "note": "Transitional fossils show features of two groups, linking them."},
+  {"s": "bio", "lv": 4, "t": "evo", "q": "Most fossils are found in which type of rock?", "a": "Sedimentary rock", "x": ["Igneous rock", "Metamorphic rock", "Volcanic rock"], "note": "Layers of sediment bury the remains, then slowly turn to rock."},
+  {"s": "bio", "lv": 4, "t": "evo", "q": "The fossil record has gaps because…", "a": "Most organisms decay or get eaten before they can fossilise", "x": ["Fossils are all fake", "Evolution stops sometimes", "Scientists throw some away"], "note": "Fossilisation needs rare conditions, like fast burial."},
+  {"s": "bio", "lv": 4, "t": "evo", "q": "Using the radioactive decay of elements in rocks to find a fossil's age in years is called…", "a": "Absolute (radiometric) dating", "x": ["Relative dating", "Carbon copying", "Comparative anatomy"], "note": "Relative dating only says older or younger, using rock layers."},
+  {"s": "bio", "lv": 4, "t": "evo", "q": "Species X has 3 differences from humans in a protein sequence. Species Y has 20 differences. Which is more closely related to humans?", "a": "Species X", "x": ["Species Y", "They're equally related", "You can't tell from proteins"], "note": "Fewer differences = a more recent common ancestor."},
+  {"s": "bio", "lv": 4, "t": "evo", "q": "Australia has many marsupials found nowhere else. This is best explained by…", "a": "Australia being isolated for millions of years, so its species evolved separately", "x": ["Australia's hot climate creating new species", "Marsupials being introduced by people", "All marsupials evolving at the same time worldwide"], "note": "This is evidence from biogeography (where species are found)."},
+  {"s": "bio", "lv": 5, "t": "data", "q": "In a forest with dark tree trunks, birds caught 30 dark moths and 90 light moths. What's the most reasonable conclusion?", "a": "Light moths are easier for birds to see on dark trunks", "x": ["Dark moths are easier for birds to see", "Birds prefer the taste of light moths", "Moth colour doesn't affect survival"], "note": "Same idea as the brown-lipped snail question in the practice exam."},
+  {"s": "bio", "lv": 5, "t": "data", "q": "In the dark forest, which moth colour would you expect to become more common over many generations?", "a": "Dark", "x": ["Light", "Both stay the same", "Neither, they'll all die"], "note": "Dark moths survive more, so they reproduce more and pass on their alleles."},
+  {"s": "bio", "lv": 5, "t": "data", "q": "A cross is expected to give 300 tall : 100 short. The actual result is 290 tall : 110 short. Why isn't it exact?", "a": "Fertilisation is random, so real results vary by chance", "x": ["The Punnett square was wrong", "The plants mutated", "Short plants are dominant"], "note": "Punnett squares give probabilities, not guarantees. Bigger samples get closer to the expected ratio."},
+  {"s": "bio", "lv": 5, "t": "data", "q": "Bacteria numbers drop sharply after an antibiotic is added, then slowly rise again. Why do they rise?", "a": "A few resistant bacteria survived and multiplied", "x": ["The antibiotic turned into food", "All the bacteria became resistant at once", "New bacteria were made by the antibiotic"], "note": "The antibiotic is the selection pressure. The survivors' offspring are resistant too."},
+  {"s": "bio", "lv": 5, "t": "data", "q": "Students use tweezers, pegs and spoons to model bird beaks picking up seeds in 30 seconds. What is the independent variable?", "a": "The type of 'beak' (tool)", "x": ["The number of seeds picked up", "The 30-second time limit", "The type of seed"], "note": "The tool is what's deliberately changed. Seeds picked up is the dependent variable."},
+  {"s": "bio", "lv": 5, "t": "data", "q": "In the beak model, which should be a controlled variable?", "a": "The time allowed for each tool", "x": ["The type of tool", "The number of seeds picked up", "Which tool is best"], "note": "Every tool must get the same time, and the same type of seed."},
+  {"s": "bio", "lv": 5, "t": "data", "q": "Snail results: in early spring (dead leaves), 58% of snails killed were pinkish-brown. In late spring (green grass), it was 87%. What's a reasonable deduction?", "a": "Shell colour camouflage changed with the seasons", "x": ["Pinkish-brown snails survive best in late spring", "Natural selection didn't change with the seasons", "Yellow snails were killed more in late spring"], "note": "Pinkish-brown stood out more against green grass, so more were eaten."},
+  {"s": "bio", "lv": 5, "t": "data", "q": "A graph shows the percentage of resistant rabbits rising each year after myxoma virus was released. Which type of graph would best show this?", "a": "Line graph", "x": ["Pie chart", "Column graph of each rabbit", "Histogram of the virus"], "note": "Change over time is continuous, so use a line graph."},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Gene", "a": "A section of DNA that codes for a particular characteristic", "x": [], "note": ""},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Allele", "a": "A different form of the same gene", "x": [], "note": ""},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Dominant", "a": "An allele that shows its effect even when only one copy is present", "x": [], "note": ""},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Recessive", "a": "An allele that only shows its effect when two copies are present", "x": [], "note": ""},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Genotype", "a": "The combination of alleles an organism has, such as Bb", "x": [], "note": ""},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Phenotype", "a": "The observable characteristics of an organism, such as eye colour", "x": [], "note": ""},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Homozygous", "a": "Having two identical alleles for a gene", "x": [], "note": ""},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Heterozygous", "a": "Having two different alleles for a gene", "x": [], "note": ""},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Selection pressure", "a": "An environmental factor that affects which organisms survive and reproduce", "x": [], "note": ""},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Vestigial structure", "a": "A structure that no longer has a useful function but was used by an ancestor", "x": [], "note": ""},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Homologous structures", "a": "Body parts with the same basic structure but different functions, showing a common ancestor", "x": [], "note": ""},
+  {"s": "bio", "lv": 6, "t": "term", "q": "Transitional fossil", "a": "A fossil that shows features of two different groups of organisms", "x": [], "note": ""},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "What are the three main factors that change the rate of a reaction (from your course outline)?", "a": "Concentration, temperature and surface area", "x": ["Colour, mass and temperature", "Volume, shape and colour", "Concentration, colour and pressure"], "note": "Learn these three. Catalysts also speed reactions up."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "Which of these would NOT speed up a reaction?", "a": "Using bigger lumps of the solid", "x": ["Heating the mixture", "Using a more concentrated acid", "Crushing the solid into a powder"], "note": "Bigger lumps = less surface area = slower."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "Marble chips and marble powder (same mass) are added to the same acid. Which reacts faster?", "a": "The powder, because it has a bigger surface area", "x": ["The chips, because they're heavier", "Both the same, because the mass is the same", "The chips, because they have a smaller surface area"], "note": "More surface exposed = more particles available to collide."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "Using a more concentrated acid speeds up a reaction because…", "a": "There are more acid particles in the same volume, so collisions happen more often", "x": ["The particles move faster", "The particles get bigger", "The activation energy goes up"], "note": "Concentration changes how often particles collide, not how fast they move."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "Raising the temperature speeds up a reaction because the particles…", "a": "Move faster, so they collide more often and with more energy", "x": ["Get bigger", "Become more concentrated", "Stop needing activation energy"], "note": "Temperature is the only one of the three factors that gives each collision more energy."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "Milk lasts longer in the fridge because…", "a": "The lower temperature slows down the reactions that spoil it", "x": ["Cold kills all bacteria", "The milk becomes more concentrated", "The fridge removes oxygen"], "note": "Lower temperature = slower particles = fewer successful collisions."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "Small twigs catch fire more easily than a large log because…", "a": "They have a larger surface area for the amount of wood", "x": ["They're a different type of wood", "They're hotter", "They have less mass, so less energy"], "note": "Same idea as powder vs chips."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "Magnesium ribbon is added to 1 M and 2 M hydrochloric acid. Which reacts faster?", "a": "The 2 M acid", "x": ["The 1 M acid", "Both react at the same rate", "Neither reacts"], "note": "2 M is more concentrated: more acid particles to collide with the magnesium."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "On a graph of gas produced against time, a steeper line means…", "a": "A faster reaction", "x": ["A slower reaction", "The reaction has stopped", "More product overall"], "note": "Steeper = more gas each second."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "On a graph of gas produced against time, the line goes flat at the end because…", "a": "One of the reactants has been used up, so the reaction has stopped", "x": ["The reaction is speeding up", "The gas has escaped", "The temperature dropped to zero"], "note": "No more reactant = no more product."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "A student tests how temperature affects the rate of reaction of magnesium with acid. Which must stay the same?", "a": "The concentration of the acid and the size of the magnesium pieces", "x": ["The temperature", "The time taken", "Nothing"], "note": "Temperature is the independent variable. The other two rate factors must be controlled."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "How could you measure the rate of reaction between marble chips and acid?", "a": "Collect the gas and record its volume every 30 seconds", "x": ["Measure the colour of the marble", "Weigh the beaker once at the start", "Count the marble chips"], "note": "You could also measure the mass loss as CO₂ escapes, or time how long the fizzing lasts."},
+  {"s": "chem", "lv": 1, "t": "rate", "q": "A catalyst…", "a": "Speeds up a reaction without being used up", "x": ["Slows a reaction down", "Is used up in the reaction", "Raises the activation energy"], "note": "Catalysts lower the activation energy. Enzymes are biological catalysts."},
+  {"s": "chem", "lv": 2, "t": "coll", "q": "According to collision theory, a reaction happens when particles…", "a": "Collide with at least the activation energy", "x": ["Are near each other", "Change colour", "Stop moving"], "note": "Not every collision works. Only collisions with enough energy are successful."},
+  {"s": "chem", "lv": 2, "t": "coll", "q": "Activation energy is…", "a": "The minimum energy particles need to react when they collide", "x": ["The energy given out by a reaction", "The energy of the products", "The speed of the particles"], "note": "Think of it as a hill the reactants must get over."},
+  {"s": "chem", "lv": 2, "t": "coll", "q": "A successful collision is one where…", "a": "The particles have enough energy to break bonds and form products", "x": ["The particles bounce off each other", "Any two particles touch", "The particles slow down"], "note": "Unsuccessful collisions just bounce apart."},
+  {"s": "chem", "lv": 2, "t": "coll", "q": "Raising the temperature gives two reasons for a faster rate. What are they?", "a": "More frequent collisions, and more collisions with at least the activation energy", "x": ["Bigger particles and more collisions", "Lower activation energy and more concentration", "More surface area and bigger particles"], "note": "Concentration and surface area only give the first reason. Temperature gives both."},
+  {"s": "chem", "lv": 2, "t": "coll", "q": "Increasing surface area speeds up a reaction because…", "a": "More particles are exposed, so there are more collisions", "x": ["The particles move faster", "The activation energy is lowered", "The particles become bigger"], "note": "Only particles on the surface of a solid can be hit."},
+  {"s": "chem", "lv": 2, "t": "coll", "q": "On an energy profile diagram, the activation energy is shown as…", "a": "The rise from the reactants up to the top of the hump", "x": ["The drop from the hump down to the products", "The difference between reactants and products", "The flat line at the start"], "note": "The difference between reactants and products is the energy released or absorbed."},
+  {"s": "chem", "lv": 2, "t": "coll", "q": "An exothermic reaction…", "a": "Releases energy, so the surroundings get warmer", "x": ["Absorbs energy, so the surroundings get colder", "Has no activation energy", "Has products with more energy than the reactants"], "note": "Exo = exit. On an energy profile, the products are lower than the reactants."},
+  {"s": "chem", "lv": 2, "t": "coll", "q": "An endothermic reaction…", "a": "Absorbs energy, so the surroundings get colder", "x": ["Releases energy, so the surroundings get warmer", "Always explodes", "Has products with less energy than the reactants"], "note": "Endo = enter. Instant ice packs are endothermic."},
+  {"s": "chem", "lv": 2, "t": "coll", "q": "Why do you need to strike a match to light it?", "a": "Striking supplies the activation energy to start the reaction", "x": ["Striking makes the match more concentrated", "Striking makes oxygen", "The match is endothermic"], "note": "Once it's burning, the reaction releases enough energy to keep itself going."},
+  {"s": "chem", "lv": 2, "t": "coll", "q": "A catalyst speeds up a reaction by…", "a": "Lowering the activation energy", "x": ["Raising the temperature", "Adding more reactant", "Making the particles bigger"], "note": "More collisions now have enough energy to succeed."},
+  {"s": "chem", "lv": 3, "t": "part", "q": "Temperature is a measure of…", "a": "The average kinetic energy of the particles", "x": ["The total energy in a substance", "The size of the particles", "How many particles there are"], "note": "Hotter = particles moving faster on average."},
+  {"s": "chem", "lv": 3, "t": "part", "q": "Two beakers of water: one at 20 °C and one at 80 °C. Which particles have more kinetic energy on average?", "a": "The water at 80 °C", "x": ["The water at 20 °C", "Both the same, because it's the same substance", "It depends on the volume"], "note": "Higher temperature = higher average kinetic energy."},
+  {"s": "chem", "lv": 3, "t": "part", "q": "On a heating curve, what do the flat sections show?", "a": "Changes of state (melting or boiling)", "x": ["The substance cooling down", "The particles stopping", "The temperature rising quickly"], "note": "Energy goes in but the temperature doesn't change until the change of state is finished."},
+  {"s": "chem", "lv": 3, "t": "part", "q": "While water is boiling, its temperature…", "a": "Stays the same until it has all turned to gas", "x": ["Keeps rising", "Drops", "Goes up and down"], "note": "The energy goes into separating the particles, not speeding them up."},
+  {"s": "chem", "lv": 3, "t": "part", "q": "During melting, the energy added mostly increases the particles'…", "a": "Potential energy (breaking attractions between them)", "x": ["Kinetic energy", "Size", "Mass"], "note": "That's why the temperature (average kinetic energy) stays flat."},
+  {"s": "chem", "lv": 3, "t": "part", "q": "On a heating curve, the sloped sections show…", "a": "The temperature rising as the particles gain kinetic energy", "x": ["A change of state", "The particles losing energy", "The substance being cooled"], "note": "Sloped = one state being heated up. Flat = changing state."},
+  {"s": "chem", "lv": 3, "t": "part", "q": "Ice at −10 °C is heated until it's steam at 110 °C. How many flat sections are on its heating curve?", "a": "2", "x": ["1", "3", "0"], "note": "One for melting (0 °C) and one for boiling (100 °C)."},
+  {"s": "chem", "lv": 3, "t": "part", "q": "Food dye spreads faster in hot water than in cold water because…", "a": "The particles move faster in hot water", "x": ["Hot water is more concentrated", "The dye particles get bigger", "Cold water has no particles moving"], "note": "This spreading is called diffusion."},
+  {"s": "chem", "lv": 3, "t": "part", "q": "For the same substance, which state has particles with the most kinetic energy?", "a": "Gas", "x": ["Solid", "Liquid", "They're all the same"], "note": "Gas particles move fastest and are furthest apart."},
+  {"s": "chem", "lv": 3, "t": "part", "q": "Car tyre pressure goes up on a hot day because the air particles…", "a": "Move faster and hit the tyre walls harder and more often", "x": ["Get bigger", "Stick together", "Stop moving"], "note": "More energetic collisions with the walls = higher pressure."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Acid + carbonate →", "a": "Salt + water + carbon dioxide", "x": ["Salt + hydrogen", "Salt + water", "Water + hydrogen"], "note": "Acid + base → salt + water. Acid + metal → salt + hydrogen."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Hydrochloric acid + sodium hydroxide →", "a": "Sodium chloride + water", "x": ["Sodium chloride + hydrogen", "Sodium hydroxide + water", "Chlorine + water"], "note": "Neutralisation: acid + base → salt + water."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Which is the balanced equation for sulfuric acid + sodium hydroxide?", "a": "H₂SO₄ + 2NaOH → Na₂SO₄ + 2H₂O", "x": ["H₂SO₄ + NaOH → NaSO₄ + H₂O", "H₂SO₄ + 2NaOH → Na₂SO₄ + H₂O", "H₂SO₄ + NaOH → Na₂SO₄ + H₂"], "note": "SO₄²⁻ needs two Na⁺. Two NaOH then make two waters."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Which is the balanced equation for magnesium + hydrochloric acid?", "a": "Mg + 2HCl → MgCl₂ + H₂", "x": ["Mg + HCl → MgCl + H", "Mg + 2HCl → MgCl₂ + H₂O", "Mg + HCl → MgCl₂ + H₂"], "note": "Metal + acid makes hydrogen gas (H₂), not water."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Which is the balanced equation for calcium carbonate + hydrochloric acid?", "a": "CaCO₃ + 2HCl → CaCl₂ + H₂O + CO₂", "x": ["CaCO₃ + HCl → CaCl + H₂O + CO₂", "CaCO₃ + 2HCl → CaCl₂ + H₂", "CaCO₃ + 2HCl → CaCl₂ + H₂O"], "note": "Carbonates give carbon dioxide as well as water."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Which is the balanced equation for nitric acid + calcium hydroxide?", "a": "2HNO₃ + Ca(OH)₂ → Ca(NO₃)₂ + 2H₂O", "x": ["HNO₃ + Ca(OH)₂ → CaNO₃ + H₂O", "2HNO₃ + Ca(OH)₂ → Ca(NO₃)₂ + H₂O", "HNO₃ + CaOH → CaNO₃ + H₂O"], "note": "Two OH⁻ make two waters. Don't forget the 2 in front of H₂O."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Which is the balanced equation for potassium carbonate + hydrochloric acid?", "a": "K₂CO₃ + 2HCl → 2KCl + H₂O + CO₂", "x": ["K₂CO₃ + HCl → KCl + H₂O + CO₂", "K₂CO₃ + 2HCl → K₂Cl + H₂O + CO₂", "KCO₃ + HCl → KCl + H₂O + CO₂"], "note": "K⁺ and Cl⁻ are both 1, so the salt is KCl. Two K means 2KCl."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Iron + hydrochloric acid → iron(II) chloride + hydrogen. Which equation is balanced?", "a": "Fe + 2HCl → FeCl₂ + H₂", "x": ["Fe + HCl → FeCl + H", "Fe + 2HCl → FeCl₂ + H₂O", "2Fe + 3HCl → 2FeCl₃ + H₂"], "note": "Iron(II) = Fe²⁺, so it needs two Cl⁻."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Which salt is made when nitric acid reacts with potassium hydroxide?", "a": "Potassium nitrate", "x": ["Potassium chloride", "Potassium sulfate", "Potassium nitride"], "note": "Nitric acid → nitrate salts. Hydrochloric → chloride. Sulfuric → sulfate."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "How do you test for the gas made when an acid reacts with a carbonate?", "a": "Bubble it through limewater: it turns milky", "x": ["Hold a lit splint to it: squeaky pop", "Hold a glowing splint in it: it relights", "Add universal indicator: it turns green"], "note": "Carbon dioxide turns limewater milky. A squeaky pop is the test for hydrogen."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Universal indicator is added to a solution with pH 2. What colour does it go?", "a": "Red", "x": ["Green", "Purple", "Blue"], "note": "Strong acid = red. Neutral = green. Strong base = purple."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Red litmus paper is dipped into sodium hydroxide solution. It…", "a": "Turns blue", "x": ["Stays red", "Turns green", "Turns purple"], "note": "Red litmus turns blue in a base. Blue litmus turns red in an acid."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Antacid tablets (containing magnesium hydroxide) relieve heartburn because…", "a": "The base neutralises some of the excess stomach acid", "x": ["They add more acid", "They make hydrogen gas", "They cool the stomach down"], "note": "Acid + base → salt + water, which raises the pH."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Excess sodium hydroxide is added to some acid. The final pH will be…", "a": "Above 7", "x": ["Exactly 7", "Below 7", "0"], "note": "Excess base means there's base left over, so the solution is basic."},
+  {"s": "chem", "lv": 4, "t": "acid", "q": "Copper metal is added to dilute hydrochloric acid. What happens?", "a": "No reaction", "x": ["Copper chloride and hydrogen form", "Copper chloride and water form", "The copper dissolves and fizzes"], "note": "Copper is below hydrogen in the reactivity series, so it doesn't react with dilute acids."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "What is the name of FeCl₂?", "a": "Iron(II) chloride", "x": ["Iron chloride", "Iron(III) chloride", "Iron dichloride"], "note": "Iron can be Fe²⁺ or Fe³⁺, so the Roman numeral is needed. Two Cl⁻ means Fe²⁺."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "What is the name of CuO?", "a": "Copper(II) oxide", "x": ["Copper oxide", "Copper(I) oxide", "Copper monoxide"], "note": "O²⁻ has a 2− charge, so copper must be Cu²⁺."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "What is the formula of iron(III) oxide?", "a": "Fe₂O₃", "x": ["FeO", "Fe₃O₂", "FeO₃"], "note": "Fe³⁺ and O²⁻: 2 × (+3) = +6 and 3 × (−2) = −6."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "What is the formula of ammonium sulfate?", "a": "(NH₄)₂SO₄", "x": ["NH₄SO₄", "NH₄(SO₄)₂", "(NH₄)₃SO₄"], "note": "NH₄⁺ is 1+, SO₄²⁻ is 2−, so you need two ammonium ions, in brackets."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "Why does FeCl₃ need a Roman numeral in its name, but NaCl doesn't?", "a": "Iron can form more than one ion; sodium only forms Na⁺", "x": ["Iron is a gas", "Sodium is a non-metal", "FeCl₃ is covalent"], "note": "Iron, copper, lead and tin all need Roman numerals."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "What is the name of N₂O₄?", "a": "Dinitrogen tetroxide", "x": ["Nitrogen oxide", "Nitrogen dioxide", "Nitrogen(IV) oxide"], "note": "It's covalent (two non-metals), so use prefixes: di = 2, tetra = 4. 'Dinitrogen tetraoxide' is also accepted. Nitrogen dioxide is NO₂."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "What is the name of CCl₄?", "a": "Carbon tetrachloride", "x": ["Carbon chloride", "Monocarbon tetrachloride", "Carbon(IV) chloride"], "note": "Only one carbon, so no prefix on carbon. Four chlorines = tetrachloride."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "Which compound is covalent?", "a": "CO₂", "x": ["NaCl", "MgO", "CaCl₂"], "note": "Covalent = non-metal + non-metal. The others are metal + non-metal (ionic)."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "How does a sodium atom become a Na⁺ ion?", "a": "It loses one electron", "x": ["It gains one electron", "It gains one proton", "It loses one proton"], "note": "Losing a negative electron leaves an overall positive charge."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "How does an oxygen atom become an O²⁻ ion?", "a": "It gains two electrons", "x": ["It loses two electrons", "It gains two protons", "It loses two protons"], "note": "Gaining two negative electrons gives a 2− charge and a full outer shell."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "An atom of magnesium-24 (atomic number 12) has…", "a": "12 protons, 12 neutrons, 12 electrons", "x": ["12 protons, 24 neutrons, 12 electrons", "24 protons, 12 neutrons, 24 electrons", "12 protons, 12 neutrons, 24 electrons"], "note": "Protons = atomic number. Neutrons = mass number − atomic number = 24 − 12."},
+  {"s": "chem", "lv": 5, "t": "name", "q": "What is the electron configuration of sodium (11 electrons)?", "a": "2, 8, 1", "x": ["2, 9", "8, 2, 1", "2, 8, 2"], "note": "Shells fill 2, then 8, then the rest. One outer electron explains Na⁺."},
+  {"s": "chem", "lv": 6, "t": "term", "q": "Reaction rate", "a": "How quickly reactants are used up or products are formed", "x": [], "note": ""},
+  {"s": "chem", "lv": 6, "t": "term", "q": "Activation energy", "a": "The minimum energy needed for colliding particles to react", "x": [], "note": ""},
+  {"s": "chem", "lv": 6, "t": "term", "q": "Collision theory", "a": "Particles must collide with enough energy for a reaction to occur", "x": [], "note": ""},
+  {"s": "chem", "lv": 6, "t": "term", "q": "Concentration", "a": "The amount of a substance dissolved in a certain volume of solution", "x": [], "note": ""},
+  {"s": "chem", "lv": 6, "t": "term", "q": "Surface area", "a": "The amount of a solid's surface exposed to the other reactant", "x": [], "note": ""},
+  {"s": "chem", "lv": 6, "t": "term", "q": "Catalyst", "a": "A substance that speeds up a reaction without being used up", "x": [], "note": ""},
+  {"s": "chem", "lv": 6, "t": "term", "q": "Exothermic", "a": "A reaction that releases energy to the surroundings", "x": [], "note": ""},
+  {"s": "chem", "lv": 6, "t": "term", "q": "Endothermic", "a": "A reaction that absorbs energy from the surroundings", "x": [], "note": ""},
+  {"s": "chem", "lv": 6, "t": "term", "q": "Neutralisation", "a": "A reaction between an acid and a base that produces a salt and water", "x": [], "note": ""},
+  {"s": "chem", "lv": 6, "t": "term", "q": "Kinetic theory", "a": "All matter is made of particles that are constantly moving", "x": [], "note": ""},
+  {"s": "chem", "lv": 6, "t": "term", "q": "Ion", "a": "An atom or group of atoms that has gained or lost electrons, so it has a charge", "x": [], "note": ""},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "Which of these is a vector quantity?", "a": "Velocity", "x": ["Speed", "Distance", "Time"], "note": "Vectors have a size and a direction. Velocity = speed in a direction."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "Which of these is a scalar quantity?", "a": "Mass", "x": ["Displacement", "Velocity", "Force"], "note": "Scalars only have a size. Displacement, velocity and force all have a direction too."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "A runner does one full lap of a 400 m track and finishes where she started. What are her distance and displacement?", "a": "Distance 400 m, displacement 0 m", "x": ["Distance 0 m, displacement 400 m", "Distance 400 m, displacement 400 m", "Distance 200 m, displacement 0 m"], "note": "Displacement is start to finish in a straight line. Same start and finish = 0 m."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "You walk 3 km east, then 4 km north. What is the size of your displacement?", "a": "5 km", "x": ["7 km", "1 km", "12 km"], "note": "Use Pythagoras: √(3² + 4²) = √25 = 5 km. 7 km is the distance walked."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "You walk 6 m east, then 2 m west. What is your displacement?", "a": "4 m east", "x": ["8 m east", "4 m west", "8 m west"], "note": "Opposite directions subtract: 6 − 2 = 4 m, still in the east direction."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "Convert 72 km/h to m/s.", "a": "20 m/s", "x": ["72 m/s", "259.2 m/s", "7.2 m/s"], "note": "km/h → m/s: divide by 3.6. 72 ÷ 3.6 = 20."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "Convert 15 m/s to km/h.", "a": "54 km/h", "x": ["4.17 km/h", "15 km/h", "150 km/h"], "note": "m/s → km/h: multiply by 3.6. 15 × 3.6 = 54."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "A cyclist rides 12 km in 30 minutes. What is her average speed?", "a": "24 km/h", "x": ["6 km/h", "0.4 km/h", "360 km/h"], "note": "30 minutes = 0.5 h. Speed = 12 ÷ 0.5 = 24 km/h."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "A car travels 150 m in 6.0 s. What is its average speed?", "a": "25 m/s", "x": ["900 m/s", "0.04 m/s", "144 m/s"], "note": "Speed = distance ÷ time = 150 ÷ 6.0 = 25 m/s."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "A train travels for 2 hours 15 minutes at a constant 120 km/h. How far does it go?", "a": "270 km", "x": ["258 km", "240 km", "300 km"], "note": "2 h 15 min = 2.25 h, not 2.15 h. Distance = 120 × 2.25 = 270 km."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "A car drives around a roundabout at a steady 30 km/h. What is changing?", "a": "Its velocity, because its direction changes", "x": ["Its speed", "Nothing, because it's at a steady speed", "Its mass"], "note": "Speed stays the same, but velocity includes direction, and the direction keeps changing."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "A car's speedometer shows…", "a": "Instantaneous speed", "x": ["Average speed", "Displacement", "Acceleration"], "note": "Instantaneous = the speed at that exact moment. Average speed = total distance ÷ total time."},
+  {"s": "phys", "lv": 1, "t": "mot", "q": "Write 0.00045 s in scientific notation.", "a": "4.5 × 10⁻⁴ s", "x": ["4.5 × 10⁴ s", "4.5 × 10⁻⁵ s", "4.5 × 10⁻³ s"], "note": "Move the decimal point 4 places right to get 4.5, so the power is −4."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "A car speeds up from 10 m/s to 25 m/s in 5.0 s. What is its acceleration?", "a": "3.0 m/s²", "x": ["5.0 m/s²", "7.0 m/s²", "2.0 m/s²"], "note": "a = (v − u) ÷ t = (25 − 10) ÷ 5.0 = 3.0 m/s²."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "A car travelling at 20 m/s brakes to a stop in 4.0 s. What is its acceleration?", "a": "−5.0 m/s²", "x": ["5.0 m/s²", "−80 m/s²", "80 m/s²"], "note": "a = (0 − 20) ÷ 4.0 = −5.0 m/s². The minus sign means it's slowing down."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "A ball is dropped from rest and falls for 3.0 s. How fast is it going? (g = 9.8 m/s²)", "a": "29.4 m/s", "x": ["3.27 m/s", "9.8 m/s", "44.1 m/s"], "note": "v = u + at = 0 + 9.8 × 3.0 = 29.4 m/s. 44.1 m is how far it fell, not its speed."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "A ball is dropped from rest. How far does it fall in 2.0 s? (g = 9.8 m/s²)", "a": "19.6 m", "x": ["9.8 m", "39.2 m", "4.9 m"], "note": "s = ut + ½at² = 0 + ½ × 9.8 × 2.0² = 19.6 m."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "A car starts from rest and accelerates at 2.0 m/s² for 6.0 s. How far does it travel?", "a": "36 m", "x": ["12 m", "72 m", "6.0 m"], "note": "s = ut + ½at² = 0 + ½ × 2.0 × 6.0² = 36 m. Don't forget to square the time."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "A car moving at 4.0 m/s accelerates at 3.0 m/s² for 4.0 s. What is its final velocity?", "a": "16 m/s", "x": ["12 m/s", "28 m/s", "7.0 m/s"], "note": "v = u + at = 4.0 + 3.0 × 4.0 = 16 m/s."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "A car moving at 4.0 m/s accelerates at 3.0 m/s² for 4.0 s. How far does it travel?", "a": "40 m", "x": ["16 m", "24 m", "64 m"], "note": "s = ut + ½at² = (4.0 × 4.0) + (½ × 3.0 × 4.0²) = 16 + 24 = 40 m."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "A car at 30 m/s brakes at −6.0 m/s². How far does it travel before stopping?", "a": "75 m", "x": ["150 m", "5.0 m", "2.5 m"], "note": "No time given, so use v² = u² + 2as: 0 = 30² + 2(−6.0)s, so s = 900 ÷ 12 = 75 m."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "An object starts from rest and accelerates at 4.0 m/s² over 50 m. What is its final speed?", "a": "20 m/s", "x": ["400 m/s", "200 m/s", "10 m/s"], "note": "v² = u² + 2as = 0 + 2 × 4.0 × 50 = 400, so v = √400 = 20 m/s. Remember the square root."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "The gradient (slope) of a displacement–time graph gives the…", "a": "Velocity", "x": ["Acceleration", "Displacement", "Force"], "note": "Change in displacement ÷ change in time = velocity."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "The gradient of a velocity–time graph gives the…", "a": "Acceleration", "x": ["Velocity", "Displacement", "Distance"], "note": "Change in velocity ÷ change in time = acceleration."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "The area under a velocity–time graph gives the…", "a": "Displacement", "x": ["Acceleration", "Velocity", "Time"], "note": "Area = velocity × time = displacement. For a sloped line, use the area of a triangle."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "On a velocity–time graph, a flat horizontal line above zero means the object is…", "a": "Moving at a constant velocity", "x": ["At rest", "Speeding up at a constant rate", "Slowing down"], "note": "Velocity isn't changing, so acceleration is zero. 'At rest' is a flat line on a displacement–time graph."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "On a displacement–time graph, a flat horizontal line means the object is…", "a": "At rest", "x": ["Moving at a constant velocity", "Accelerating", "Falling"], "note": "Displacement isn't changing, so it isn't moving. Easy to mix up with velocity–time graphs."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "A velocity–time graph rises in a straight line from 0 to 12 m/s over 4.0 s. What is the displacement?", "a": "24 m", "x": ["48 m", "3.0 m", "12 m"], "note": "Area of the triangle = ½ × base × height = ½ × 4.0 × 12 = 24 m. 3.0 m/s² is the gradient (acceleration)."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "A ticker timer makes 50 dots every second. What is the time between two dots?", "a": "0.02 s", "x": ["0.5 s", "50 s", "0.2 s"], "note": "1 ÷ 50 = 0.02 s."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "On a ticker tape, the dots get further apart along the tape. The trolley was…", "a": "Speeding up", "x": ["Slowing down", "Moving at a constant speed", "Stopped"], "note": "Same time between dots, but more distance each time, so it's going faster."},
+  {"s": "phys", "lv": 2, "t": "mot", "q": "A hammer and a feather are dropped together on the Moon, where there's no air. What happens?", "a": "They land at the same time", "x": ["The hammer lands first", "The feather lands first", "The feather floats"], "note": "Without air resistance, everything falls with the same acceleration. Mass doesn't change it."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "Newton's first law says an object stays at rest or keeps moving at a constant velocity unless…", "a": "An unbalanced (net) force acts on it", "x": ["It runs out of energy", "Gravity stops acting on it", "Its mass changes"], "note": "This is also called the law of inertia."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "A bus brakes suddenly and the standing passengers lurch forward. This is because of…", "a": "Inertia: their bodies keep moving forward", "x": ["A force pushing them forward", "Newton's third law", "Gravity"], "note": "Nothing pushes them forward. Their bodies keep moving (first law) while the bus slows down."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "A 1200 kg car has a net force of 3600 N acting on it. What is its acceleration?", "a": "3.0 m/s²", "x": ["0.33 m/s²", "4800 m/s²", "4 320 000 m/s²"], "note": "a = F ÷ m = 3600 ÷ 1200 = 3.0 m/s²."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "What net force is needed to accelerate a 60 kg cyclist at 2.5 m/s²?", "a": "150 N", "x": ["24 N", "62.5 N", "0.04 N"], "note": "F = ma = 60 × 2.5 = 150 N."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "A 100 kg crate is pushed with 500 N. Friction is 200 N. What is its acceleration?", "a": "3.0 m/s²", "x": ["7.0 m/s²", "5.0 m/s²", "2.0 m/s²"], "note": "Net force = 500 − 200 = 300 N. a = 300 ÷ 100 = 3.0 m/s². Always find the net force first."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "Two forces act on an object: 30 N east and 40 N north. What is the size of the net force?", "a": "50 N", "x": ["70 N", "10 N", "1200 N"], "note": "The forces are at 90°, so use Pythagoras: √(30² + 40²) = 50 N."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "A box has 80 N pushing it right and 80 N pushing it left. What can you say?", "a": "The net force is 0 N, so its velocity doesn't change", "x": ["The net force is 160 N to the right", "It must be at rest", "The net force is 80 N"], "note": "Balanced forces mean no acceleration. It could be at rest OR moving at a constant velocity."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "What is the weight of a 50 kg student on Earth? (g = 9.8 m/s²)", "a": "490 N", "x": ["50 N", "5.1 N", "50 kg"], "note": "Weight is a force: W = mg = 50 × 9.8 = 490 N. Mass (kg) and weight (N) are different things."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "A book rests on a table. The normal force on the book is…", "a": "Equal to its weight, pushing upwards", "x": ["Zero, because it isn't moving", "Double its weight", "Equal to its weight, pushing downwards"], "note": "The table pushes up just enough to balance the weight, so the net force is zero."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "The Earth pulls an apple down. What is the third law reaction force?", "a": "The apple pulls the Earth up", "x": ["The table pushes the apple up", "Air resistance pushes the apple up", "The apple pushes the table down"], "note": "Action–reaction pairs act on two different objects and are the same type of force (here, both gravity)."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "A rocket moves upwards because…", "a": "It pushes gases down, and the gases push the rocket up", "x": ["The gases push against the ground", "Gravity is turned off in space", "The rocket is lighter than air"], "note": "Newton's third law. This also works in space, where there's no ground or air to push on."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "Which of these is a non-contact force?", "a": "Gravity", "x": ["Friction", "Normal force", "Air resistance"], "note": "Gravity, magnetic and electrostatic forces act without touching."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "The same force pushes a car and a truck. The truck has 4 times the mass. The truck's acceleration is…", "a": "One quarter of the car's", "x": ["4 times the car's", "The same as the car's", "Half the car's"], "note": "a = F ÷ m. Same F, 4 times the m, so a quarter of the acceleration."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "A car cruises at a steady 100 km/h on a straight highway. The forces on it are…", "a": "Balanced: the driving force equals friction and drag", "x": ["Unbalanced: the driving force is bigger", "Zero: no forces act on it", "Unbalanced: drag is bigger"], "note": "Constant velocity means zero net force (first law). The engine is still pushing, but it only matches the resistance."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "A marble rolls down a ramp. As the ramp gets steeper, its acceleration…", "a": "Increases", "x": ["Decreases", "Stays the same", "Becomes zero"], "note": "A steeper slope means more of the marble's weight acts along the slope, so the net force down the slope is bigger."},
+  {"s": "phys", "lv": 3, "t": "frc", "q": "In a force (free body) diagram, the length of each arrow shows…", "a": "How big the force is", "x": ["How fast the object is moving", "How heavy the object is", "How long the force acts for"], "note": "Arrow direction = direction of the force. Arrow length = size of the force."},
+  {"s": "phys", "lv": 4, "t": "safe", "q": "Which of these is an ACTIVE safety feature?", "a": "Anti-lock brakes (ABS)", "x": ["Airbags", "Crumple zones", "Seat belts"], "note": "Active features help prevent a crash. Passive features reduce injury when a crash happens."},
+  {"s": "phys", "lv": 4, "t": "safe", "q": "Which of these is a PASSIVE safety feature?", "a": "Crumple zones", "x": ["Anti-lock brakes (ABS)", "Traction control", "Good tyres"], "note": "Passive = protects you during the crash."},
+  {"s": "phys", "lv": 4, "t": "safe", "q": "Crumple zones reduce injury because they…", "a": "Increase the time of the collision, which reduces the force", "x": ["Make the car too strong to bend", "Stop the car instantly", "Increase the force so the car stops faster"], "note": "Same change in velocity spread over a longer time = smaller acceleration, so a smaller force on the people inside."},
+  {"s": "phys", "lv": 4, "t": "safe", "q": "An airbag protects your head by…", "a": "Increasing its stopping time and spreading the force over a bigger area", "x": ["Bouncing your head backwards", "Stopping your head instantly", "Reducing your mass"], "note": "Longer stopping time = smaller force. Bigger area = the force is less concentrated."},
+  {"s": "phys", "lv": 4, "t": "safe", "q": "Why do you keep moving forward in a crash if you're not wearing a seat belt?", "a": "Inertia: your body keeps moving after the car stops", "x": ["The crash pushes you forward", "The airbag pulls you forward", "Gravity pulls you forward"], "note": "Newton's first law. The seat belt supplies the force that slows your body down with the car."},
+  {"s": "phys", "lv": 4, "t": "safe", "q": "Why do built-up areas have lower speed limits? Doubling a car's speed…", "a": "Gives 4 times the kinetic energy", "x": ["Doubles the kinetic energy", "Halves the kinetic energy", "Doesn't change the kinetic energy"], "note": "Ek = ½mv², so speed is squared. Double v → 2² = 4 times the energy to get rid of when stopping."},
+  {"s": "phys", "lv": 4, "t": "safe", "q": "A headrest mainly protects against…", "a": "Whiplash in a rear-end collision", "x": ["Hitting the steering wheel", "Being thrown out of the car", "Hitting the windscreen"], "note": "In a rear-end crash the car (and your body) is pushed forward, but your head lags behind."},
+  {"s": "phys", "lv": 4, "t": "nrg", "q": "The law of conservation of energy says energy…", "a": "Can't be created or destroyed, only changed from one form to another", "x": ["Is always lost as heat", "Can be created by machines", "Is destroyed when an object stops"], "note": "The total amount of energy stays the same. It can only change form or move."},
+  {"s": "phys", "lv": 4, "t": "nrg", "q": "A ball is dropped from a height. As it falls, the main energy change is…", "a": "Gravitational potential → kinetic", "x": ["Kinetic → gravitational potential", "Chemical → kinetic", "Heat → kinetic"], "note": "It loses height (less Ep) and gains speed (more Ek)."},
+  {"s": "phys", "lv": 4, "t": "nrg", "q": "When a car brakes, most of its kinetic energy becomes…", "a": "Heat in the brakes", "x": ["Gravitational potential energy", "Chemical energy in the fuel", "Light"], "note": "Friction in the brakes turns kinetic energy into heat (and a little sound)."},
+  {"s": "phys", "lv": 4, "t": "nrg", "q": "A roller coaster car has 50 kJ of gravitational potential energy at the top. Ignoring friction, how much kinetic energy does it have at the bottom?", "a": "50 kJ", "x": ["0 kJ", "25 kJ", "100 kJ"], "note": "With no friction, all the Ep becomes Ek. Energy is conserved."},
+  {"s": "phys", "lv": 4, "t": "nrg", "q": "A dropped ball bounces lower each time. Why?", "a": "Some energy turns into heat and sound at each bounce", "x": ["Energy is destroyed at each bounce", "Gravity gets stronger", "The ball loses mass"], "note": "Energy isn't destroyed. It changes into less useful forms, so less is left as Ek and Ep."},
+  {"s": "phys", "lv": 4, "t": "nrg", "q": "Kinetic energy depends on an object's…", "a": "Mass and speed", "x": ["Mass and height", "Height and speed", "Speed only"], "note": "Ek = ½mv². Height is for gravitational potential energy (Ep = mgh)."},
+  {"s": "phys", "lv": 4, "t": "nrg", "q": "Gravitational potential energy depends on an object's…", "a": "Mass and height", "x": ["Mass and speed", "Speed and height", "Shape and colour"], "note": "Ep = mgh. On Earth, g is the same for everything."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "What is the kinetic energy of a 2.0 kg ball moving at 3.0 m/s?", "a": "9.0 J", "x": ["6.0 J", "18 J", "3.0 J"], "note": "Ek = ½mv² = ½ × 2.0 × 3.0² = 9.0 J. Square the speed before multiplying."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "What is the kinetic energy of a 1000 kg car moving at 20 m/s?", "a": "200 000 J", "x": ["20 000 J", "10 000 J", "400 000 J"], "note": "Ek = ½ × 1000 × 20² = ½ × 1000 × 400 = 200 000 J (200 kJ)."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "If a car's speed doubles, its kinetic energy…", "a": "Becomes 4 times bigger", "x": ["Doubles", "Stays the same", "Becomes 8 times bigger"], "note": "Speed is squared in Ek = ½mv², so 2² = 4."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "A 5.0 kg box is lifted 2.0 m. How much gravitational potential energy does it gain?", "a": "98 J", "x": ["10 J", "49 J", "7.0 J"], "note": "Ep = mgh = 5.0 × 9.8 × 2.0 = 98 J."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "A 60 kg diver stands on a 10 m platform. What is her gravitational potential energy?", "a": "5880 J", "x": ["600 J", "588 J", "58 800 J"], "note": "Ep = mgh = 60 × 9.8 × 10 = 5880 J."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "A ball is dropped from 5.0 m. Ignoring air resistance, how fast is it going when it hits the ground?", "a": "9.9 m/s", "x": ["98 m/s", "49 m/s", "7.0 m/s"], "note": "Ep at the top = Ek at the bottom: mgh = ½mv², so v = √(2gh) = √(2 × 9.8 × 5.0) = √98 ≈ 9.9 m/s."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "You push a trolley with 50 N for 8.0 m. How much work do you do?", "a": "400 J", "x": ["6.25 J", "58 J", "42 J"], "note": "W = Fd = 50 × 8.0 = 400 J."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "You hold a heavy box still for 2 minutes. How much work do you do on the box?", "a": "0 J, because the box doesn't move", "x": ["It depends on how heavy the box is", "It depends on how long you hold it", "A lot, because you get tired"], "note": "W = Fd. No distance moved = no work done on the box, even though your muscles get tired."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "A motor does 1200 J of work in 4.0 s. What is its power?", "a": "300 W", "x": ["4800 W", "0.0033 W", "1204 W"], "note": "P = W ÷ t = 1200 ÷ 4.0 = 300 W."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "A student lifts a 60 kg mass up 3.0 m in 2.0 s. What is her power?", "a": "882 W", "x": ["90 W", "1764 W", "360 W"], "note": "Work = mgh = 60 × 9.8 × 3.0 = 1764 J. Power = 1764 ÷ 2.0 = 882 W. Two steps."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "The unit of power is the…", "a": "Watt (W), which is 1 joule per second", "x": ["Joule (J)", "Newton (N)", "Newton per second"], "note": "1 W = 1 J/s. Work and energy are in joules; force is in newtons."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "A motor uses 500 J of electrical energy and gives out 400 J of useful kinetic energy. What is its efficiency?", "a": "80%", "x": ["125%", "20%", "0.8%"], "note": "Efficiency = useful ÷ total × 100 = 400 ÷ 500 × 100 = 80%."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "A light bulb uses 100 J and gives out 15 J of light. Where does most of the other 85 J go?", "a": "Heat", "x": ["It's destroyed", "It's stored in the bulb", "Sound"], "note": "The bulb is 15% efficient. The wasted energy mostly becomes heat."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "A 2000 W kettle is 90% efficient. How much useful energy does it give the water each second?", "a": "1800 J", "x": ["2000 J", "200 J", "2222 J"], "note": "2000 W = 2000 J every second. 90% of 2000 = 1800 J."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "An 800 kg car drives up a hill and rises 25 m. How much gravitational potential energy does it gain?", "a": "196 000 J", "x": ["20 000 J", "19 600 J", "1 960 000 J"], "note": "Ep = mgh = 800 × 9.8 × 25 = 196 000 J. 20 000 J is what you get if you forget g."},
+  {"s": "phys", "lv": 5, "t": "nrg", "q": "Why can no machine be more than 100% efficient?", "a": "You can't get out more energy than you put in", "x": ["Machines are badly built", "Efficiency is measured in joules", "Friction creates energy"], "note": "Conservation of energy. Real machines always waste some energy, usually as heat."},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Vector", "a": "A quantity that has both size (magnitude) and direction", "x": [], "note": ""},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Scalar", "a": "A quantity that has size (magnitude) only", "x": [], "note": ""},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Displacement", "a": "The straight-line distance and direction from the start point to the finish point", "x": [], "note": ""},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Velocity", "a": "The rate of change of displacement: speed in a particular direction", "x": [], "note": ""},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Acceleration", "a": "The rate of change of velocity", "x": [], "note": ""},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Inertia", "a": "The tendency of an object to resist a change in its motion", "x": [], "note": ""},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Net force", "a": "The overall force on an object when all the forces acting on it are added together", "x": [], "note": ""},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Kinetic energy", "a": "The energy an object has because it is moving", "x": [], "note": ""},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Gravitational potential energy", "a": "The energy an object has because of its height above the ground", "x": [], "note": ""},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Work", "a": "The energy transferred when a force moves an object through a distance", "x": [], "note": ""},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Power", "a": "The rate at which work is done or energy is transferred", "x": [], "note": ""},
+  {"s": "phys", "lv": 6, "t": "term", "q": "Efficiency", "a": "The percentage of the total energy put in that is changed into useful energy", "x": [], "note": ""},
+  {"s": "inq", "lv": 1, "t": "var", "q": "A hypothesis is…", "a": "A testable statement that links the independent and dependent variables", "x": ["A question about what will happen", "The result of an experiment", "A list of the equipment needed"], "note": "It's written as a statement, not a question, and it has to be testable."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "Which of these is a properly written hypothesis?", "a": "If the water temperature increases, then the sugar will dissolve faster", "x": ["Does sugar dissolve faster in hot water?", "Sugar is interesting to test", "I will put sugar in water and watch it"], "note": "It names the independent variable (temperature) AND the dependent variable (how fast it dissolves). 'If… then…' works well."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "The independent variable is the factor that…", "a": "Is deliberately changed by the scientist", "x": ["Is measured in the experiment", "Is kept the same", "Changes by accident"], "note": "Also called the manipulated variable. There should only be one."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "The dependent variable is the factor that…", "a": "Is measured, because it responds to the change", "x": ["Is deliberately changed", "Is kept the same", "Is ignored"], "note": "Also called the responding variable. It's your data."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "Controlled variables are…", "a": "Factors kept the same in every set-up, so it's a fair test", "x": ["Factors that are measured", "The factor that is changed", "Factors you can't do anything about"], "note": "Also called constants."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "Students of different ages are timed doing the same jigsaw puzzle. What is the independent variable?", "a": "The age of the students", "x": ["The time taken", "The jigsaw puzzle", "The room they're in"], "note": "Age is what's different between the people being tested."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "Students of different ages are timed doing the same jigsaw puzzle. What is the dependent variable?", "a": "The time taken to finish the puzzle", "x": ["The age of the students", "The number of pieces", "How tired they are"], "note": "Time is what's measured."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "A student tests how the type of fertiliser affects plant growth. Which is a controlled variable?", "a": "The volume of water each plant gets", "x": ["The type of fertiliser", "The height of the plants", "Which fertiliser works best"], "note": "Water, soil, sunlight and plant type all have to stay the same."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "A Berocca tablet is dropped into water at different temperatures, and the time to finish fizzing is recorded. What is the dependent variable?", "a": "The time taken for the tablet to finish reacting", "x": ["The temperature of the water", "The mass of the tablet", "The volume of water"], "note": "Time is measured. A shorter time means a faster reaction rate."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "In the Berocca experiment, which should be kept the same?", "a": "The mass of the tablet and the volume of water", "x": ["The temperature of the water", "The time taken to react", "Nothing needs to be kept the same"], "note": "Water temperature is the independent variable, so it's the one thing that changes."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "Hypothesis: 'Exercise increases breathing rate.' What is the independent variable?", "a": "Amount of exercise", "x": ["Breathing rate", "The person's age", "The time of day"], "note": "The hypothesis says exercise causes the change, so exercise is what you change."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "An uncontrolled variable is a factor that…", "a": "Wasn't kept the same, because it was overlooked or impossible to control", "x": ["Was deliberately changed", "Was measured", "Was kept the same in every test"], "note": "E.g. how alert each person was in the jigsaw test."},
+  {"s": "inq", "lv": 1, "t": "var", "q": "Sam times how long bubbles are produced when vinegar (acetic acid) and bicarb soda react at different temperatures. What is the independent variable?", "a": "The temperature of the water bath", "x": ["The time bubbles are produced for", "The amount of vinegar", "The size of the flask"], "note": "Sam deliberately sets different temperatures."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "A control group is…", "a": "A group used as a standard for comparison, without the change being tested", "x": ["The group that gets the new treatment", "The group that does the experiment best", "The group with the most people in it"], "note": "It shows whether the independent variable actually made a difference."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "In the fertiliser experiment, one pot was watered with plain tap water. Why?", "a": "It's the control, so you can compare and see whether the fertilisers made a difference", "x": ["To save fertiliser", "Because tap water is a fertiliser", "To make the plants grow faster"], "note": "Without the control, you can't tell if the plants would have grown just as well anyway."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "Smithers gives Group A a special juice and Group B nothing. Which group is the control?", "a": "Group B", "x": ["Group A", "Both groups", "Neither group"], "note": "Group B doesn't get the thing being tested."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "Reliability means…", "a": "The experiment gives the same or similar results each time it is repeated", "x": ["The experiment tests what it is supposed to test", "The measurements are very exact", "The scientist is trustworthy"], "note": "Repeat trials and large samples improve reliability."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "Validity means…", "a": "The experiment actually tests what it is supposed to test", "x": ["The results are the same every time", "The experiment was done quickly", "The equipment was expensive"], "note": "Controlling variables and using suitable equipment improves validity."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "Which of these improves reliability?", "a": "Doing three trials and calculating an average", "x": ["Testing only one plant", "Changing two variables at once", "Leaving out results that look odd"], "note": "Repeating balances out chance errors."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "Krusty tests a new itching powder on one person and his usual powder on one other person. What's the biggest problem?", "a": "The sample size is too small to be reliable", "x": ["He used a control", "He measured time", "Itching powder can't be tested"], "note": "With one person each, the difference could just be the people. Test many people."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "Repetition means doing the experiment several times. Replication means…", "a": "Running a number of identical experiments at the same time", "x": ["Copying someone else's results", "Changing the independent variable", "Writing up the report"], "note": "Both help show the results are consistent."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "Why should test subjects be chosen randomly?", "a": "To avoid biased results", "x": ["To make the experiment faster", "To make sure everyone gets the same result", "So you need fewer subjects"], "note": "Random sampling stops the scientist picking subjects that suit the result they want."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "A student changes both the temperature AND the type of acid in the same test. What's wrong?", "a": "It isn't a fair test, because you can't tell which change caused the result", "x": ["Nothing, it saves time", "It makes the results more reliable", "It makes the experiment valid"], "note": "Only change one variable at a time."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "Francis burns 5 of each type of candle and averages the times. Why?", "a": "To increase the reliability of his results", "x": ["To make the candles burn longer", "To change the independent variable", "Because one candle isn't enough light"], "note": "Averaging repeat trials reduces the effect of chance errors."},
+  {"s": "inq", "lv": 2, "t": "fair", "q": "In the Berocca experiment, the water temperatures were just 'iced', 'cold', 'warm' and 'hot'. What's the best improvement?", "a": "Measure the exact water temperature with a thermometer", "x": ["Use a bigger tablet", "Do fewer trials", "Use juice instead of water"], "note": "Measuring the independent variable precisely makes the experiment more valid."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "On a graph, the independent variable goes on the…", "a": "x-axis (horizontal)", "x": ["y-axis (vertical)", "Title only", "Key"], "note": "The dependent variable goes on the y-axis."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "Which type of graph suits continuous data, like plant height over time?", "a": "Line graph", "x": ["Column graph", "Pie chart", "Table"], "note": "Line graphs show data that is connected, such as change over time."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "Which type of graph suits data in separate categories, like the number of students who play each sport?", "a": "Column (bar) graph", "x": ["Line graph", "Scatter graph", "Histogram"], "note": "Categories are discrete (separate), so use columns."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "How is a histogram different from a column graph?", "a": "There are no gaps between the columns", "x": ["It always shows percentages", "Its columns are always square", "It only shows part of the data"], "note": "Histograms show ranges of continuous data, so the columns touch."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "A school counts how many students use the canteen on each day of the week. Which graph is best?", "a": "Column graph", "x": ["Line graph", "Scatter graph", "Pie chart"], "note": "Days are separate categories."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "A chemical contains 10% sodium, 30% potassium, 40% oxygen, 15% magnesium and 5% other. Which is the LEAST suitable way to show this?", "a": "Line graph", "x": ["Pie chart", "Column graph", "Table"], "note": "There's no trend over time or connection between the elements, so a line graph makes no sense."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "Which of these must a graph have?", "a": "A title, labelled axes with units, and even scales", "x": ["Colours on every point", "The raw data written next to it", "A curved line through every point"], "note": "The title should name both variables."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "A table of results should have…", "a": "A title, labelled columns with units, and averages if there are repeat trials", "x": ["No units, to keep it neat", "Only the averages", "The method written above it"], "note": "Units go in the column headings, not after every number."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "On a line graph, you should…", "a": "Rule straight lines between the points (or draw a line of best fit)", "x": ["Draw the line freehand", "Leave the points unjoined", "Start the line at the top of the graph"], "note": "Use a ruler and pencil."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "The scales on a graph should…", "a": "Go up in equal steps and use more than half the grid", "x": ["Go up in different steps to fit the data", "Be in pen", "Start at the first data value only"], "note": "Uneven scales make trends look wrong."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "Quantitative data is…", "a": "Numerical data, like a temperature or a mass", "x": ["Descriptive data, like a colour or smell", "Data that can't be measured", "Only data shown on a pie chart"], "note": "Qualitative data describes qualities (colour, texture, smell)."},
+  {"s": "inq", "lv": 3, "t": "graph", "q": "'The solution turned a cloudy white colour.' This is…", "a": "Qualitative data", "x": ["Quantitative data", "A hypothesis", "A controlled variable"], "note": "It's a description, not a number."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "What is the mode of: 3, 8, 5, 2, 5, 9, 1, 3, 5, 9?", "a": "5", "x": ["9", "3", "8"], "note": "The mode is the most common value. 5 appears three times; 3 and 9 only twice. (The class answer key says 9, which is wrong.)"},
+  {"s": "inq", "lv": 4, "t": "data", "q": "What is the range of: 3, 8, 5, 2, 5, 9, 1, 3, 5, 9?", "a": "8", "x": ["9", "6", "1"], "note": "Range = highest − lowest = 9 − 1 = 8."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "Three trials give 45 s, 52 s and 56 s. What is the average (mean)?", "a": "51 s", "x": ["52 s", "153 s", "11 s"], "note": "Add them (153) and divide by the number of trials (3)."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "What is the median of: 4, 7, 2, 9, 5?", "a": "5", "x": ["7", "2", "5.4"], "note": "Put them in order first: 2, 4, 5, 7, 9. The middle value is 5. (5.4 is the mean.)"},
+  {"s": "inq", "lv": 4, "t": "data", "q": "Berocca results: iced water 127 s, cold 87 s, warm 74 s, hot 51 s. What is the trend?", "a": "As temperature increases, the reaction time decreases, so the reaction rate increases", "x": ["As temperature increases, the reaction rate decreases", "Temperature has no effect", "The reaction time increases with temperature"], "note": "Shorter time = faster rate. Be careful: time going DOWN means rate going UP."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "Fertiliser results after 4 weeks: tap water 20 cm, Quick Grow 35 cm, Grow Right 32 cm, Grow Up 40 cm. Which conclusion is best?", "a": "Grow Up was the most effective, with an average height of 40 cm", "x": ["All fertilisers worked the same", "Tap water was the most effective", "Quick Grow was the most effective, because it's first"], "note": "Always back up a conclusion with numbers from the data."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "Smithers' juice group made 1587 stacks; the group with no juice made 2113. What should he conclude?", "a": "The juice did not increase productivity", "x": ["The juice increased productivity", "The juice doubled productivity", "Nothing, because there was a control"], "note": "The juice group actually made fewer stacks."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "Bart's radio-wave mice: 8 out of 10 pushed the block. Untreated mice: 7 out of 10. What's the best conclusion?", "a": "Inconclusive: the difference is too small with only 10 mice in each group", "x": ["Radio waves definitely make mice stronger", "Radio waves make mice weaker", "The untreated mice were stronger"], "note": "One mouse's difference could easily be chance. He needs many more mice."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "Reading a value BETWEEN your plotted points on a graph is called…", "a": "Interpolation", "x": ["Extrapolation", "Replication", "Tabulation"], "note": "Extrapolation is extending the trend BEYOND your data, which is less reliable."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "Why is extrapolation less reliable than interpolation?", "a": "You're assuming the trend continues past the data you actually collected", "x": ["It uses more data", "It's done with a ruler", "It's always wrong"], "note": "The trend might change outside the range you tested."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "An electronic balance wasn't set to zero, so every mass reads 2 g too high. This is a…", "a": "Systematic error", "x": ["Random error", "Parallax error", "Controlled variable"], "note": "Systematic errors push every reading the same way. Repeating won't fix them; fixing the equipment will."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "Reading a measuring cylinder from an angle instead of at eye level causes…", "a": "Parallax error", "x": ["Systematic error from the scale", "A controlled variable", "Extrapolation"], "note": "Always read at eye level with the bottom of the meniscus."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "Which website is most likely to give biased information about the benefits of vitamins?", "a": "A vitamin company's website", "x": ["A government health website", "A university nutrition department", "A hospital's health information page"], "note": "A company selling vitamins has a reason to make them sound good."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "Which of these is written in the passive voice (used in science reports)?", "a": "The change of colour was observed", "x": ["Michael added 50 g of salt", "We found the temperature rose", "I mixed the two solutions"], "note": "Passive voice focuses on what was done, not who did it."},
+  {"s": "inq", "lv": 4, "t": "data", "q": "In a report, the conclusion should…", "a": "Answer the aim and say whether the hypothesis was supported", "x": ["List the equipment", "Describe the method step by step", "Repeat the title"], "note": "Use the results as evidence."},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Hypothesis", "a": "A testable statement that links the independent and dependent variables", "x": [], "note": ""},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Variable", "a": "Any factor in an experiment that can change or could affect the results", "x": [], "note": ""},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Independent variable", "a": "The factor that is deliberately changed or manipulated in an experiment", "x": [], "note": ""},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Dependent variable", "a": "The factor that responds to the change and is measured", "x": [], "note": ""},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Controlled variable", "a": "A factor kept the same in all set-ups so the test is fair", "x": [], "note": ""},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Control group", "a": "A group used as a standard for comparison, without the treatment being tested", "x": [], "note": ""},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Reliability", "a": "How well an experiment gives the same results each time it is repeated", "x": [], "note": "Improve it with repeat trials and a large sample size."},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Validity", "a": "Whether an experiment actually tests what it is supposed to test", "x": [], "note": "Improve it by controlling variables and using suitable equipment."},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Accuracy", "a": "How close a measurement is to the true value", "x": [], "note": "The class sheet words it as 'how exact the measurements are'. Either wording should get the mark."},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Trial", "a": "Each repetition of an experiment", "x": [], "note": ""},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Quantitative data", "a": "Data in the form of numbers or measurements", "x": [], "note": ""},
+  {"s": "inq", "lv": 5, "t": "term", "q": "Qualitative data", "a": "Data that describes qualities, such as colour, smell or texture", "x": [], "note": ""}
+];
+
+var STORE_KEY="garrick-y10-s2-exam-v1";
+var SUBJ_KEY="garrick-y10-s2-exam-subject";
+var SUBJ_ORDER=["bio","chem","phys","inq"];
+
+function copyData(src){return src.map(function(d){return JSON.parse(JSON.stringify(d));});}
+function loadData(){
+  try{var raw=localStorage.getItem(STORE_KEY);if(raw){var p=JSON.parse(raw);if(Array.isArray(p)&&p.length)return p;}}catch(e){}
+  return copyData(DEFAULT_DATA);
+}
+function saveData(){try{localStorage.setItem(STORE_KEY,JSON.stringify(DATA));}catch(e){}}
+var DATA=loadData();
+
+// ── game state ──
+var currentSubj="bio",currentLevel=1,levelMemory={};
+var deck=[],weak=[],cur=null,answered=false;
+var C=0,W=0,streak=0,lvXP=0;
+var totalC=0,totalW=0,totalXP=0;
+
+function shuf(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function $(id){return document.getElementById(id);}
+function S(){return SUBJECTS[currentSubj];}
+function maxLevel(){return S().levels.length;}
+function levelInfo(n){return S().levels[n-1];}
+function cardsForLevel(lv){return DATA.filter(function(d){return d.s===currentSubj&&d.lv===lv;});}
+
+function applyTheme(){
+  var r=document.documentElement.style,s=S();
+  r.setProperty("--bg",s.bg);r.setProperty("--accent",s.accent);r.setProperty("--dark",s.dark);r.setProperty("--tint",s.tint);
+  var m=document.querySelector('meta[name="theme-color"]');if(m)m.setAttribute("content",s.bg);
+}
+
+function renderSubjects(){
+  var h=$("subjects");h.innerHTML="";
+  SUBJ_ORDER.forEach(function(k){
+    var b=document.createElement("button");b.className="subj"+(k===currentSubj?" on":"");
+    var se=document.createElement("span");se.className="se";se.textContent=SUBJECTS[k].emoji;var sn=document.createElement("span");sn.textContent=SUBJECTS[k].short||SUBJECTS[k].name;b.appendChild(se);b.appendChild(sn);b.title=SUBJECTS[k].name;b.setAttribute("aria-pressed",k===currentSubj?"true":"false");
+    b.addEventListener("click",function(){switchSubject(k);});
+    h.appendChild(b);
+  });
+}
+
+function switchSubject(k){
+  if(!SUBJECTS[k])return;
+  levelMemory[currentSubj]=currentLevel;
+  currentSubj=k;
+  try{localStorage.setItem(SUBJ_KEY,k);}catch(e){}
+  applyTheme();renderSubjects();
+  startLevel(levelMemory[k]||1);
+}
+
+function startLevel(lv){
+  if(lv<1||lv>maxLevel())lv=1;
+  currentLevel=lv;
+  deck=shuf(cardsForLevel(lv).slice());
+  weak=[];C=0;W=0;streak=0;lvXP=0;
+  hideAll();
+  $("retry-bar").style.display="none";
+  updateBar();updateStats();renderJumps();
+  next();
+}
+
+function hideAll(){
+  ["qhead","grid","frow","stats","level-summary","done","empty"].forEach(function(id){$(id).style.display="none";});
+}
+
+function next(){
+  answered=false;
+  $("nxt").style.display="none";
+  $("fb").textContent="";$("fb").className="";
+  $("fnote").style.display="none";$("fnote").textContent="";
+
+  if(!deck.length&&!weak.length){
+    if(C+W===0){hideAll();$("empty").style.display="block";return;}
+    showLevelSummary();return;
+  }
+  if(!deck.length){deck=shuf(weak.slice());weak=[];$("retry-bar").style.display="block";}
+
+  cur=deck.shift();updateProg();
+  var b=BADGES[cur.t]||["b1","question"];
+  $("badge").className=b[0];$("badge").textContent=b[1];
+
+  var qt,qs,correct,dists;
+  if(cur.t==="term"){
+    var pool=DATA.filter(function(c){return c!==cur&&c.t==="term"&&c.s===cur.s;});
+    var showTerm=Math.random()<0.5;
+    if(showTerm){qt=cur.q;qs="Which definition matches this term?";correct=cur.a;dists=shuf(pool.slice()).map(function(c){return c.a;});}
+    else{qt=cur.a;qs="Which term matches this definition?";correct=cur.q;dists=shuf(pool.slice()).map(function(c){return c.q;});}
+  } else {
+    qt=cur.q;qs="Choose the best answer";correct=cur.a;dists=shuf((cur.x||[]).filter(function(s){return s&&s.trim();}).slice());
+  }
+  dists=dists.filter(function(d){return d!==correct;}).slice(0,3);
+
+  var qel=$("qtext");qel.textContent=qt;
+  qel.className=qt.length>130?"long":(qt.length>70?"mid":"");
+  $("qsub").textContent=qs;
+  $("qhead").style.display="block";$("frow").style.display="flex";$("stats").style.display="flex";$("grid").style.display="grid";
+
+  var opts=shuf([correct].concat(dists));
+  $("grid").className=opts.some(function(o){return o&&o.length>38;})?"wide":"";
+  for(var i=0;i<4;i++){
+    var el=$("o"+i);
+    el.className="opt";
+    el.style.display=opts[i]===undefined?"none":"flex";
+    el.querySelector(".txt").textContent=opts[i]||"";
+    el.dataset.val=opts[i]||"";
+  }
+  bindOpts(correct);
+}
+
+function showNote(){
+  if(cur.note&&cur.note.trim()){$("fnote").textContent=cur.note;$("fnote").style.display="block";}
+}
+
+function bindOpts(correct){
+  for(var i=0;i<4;i++){
+    (function(el){
+      var n=el.cloneNode(true);el.parentNode.replaceChild(n,el);
+      function handle(e){if(e.type==="touchend")e.preventDefault();pick(n,n.dataset.val,correct);}
+      n.addEventListener("touchend",handle,{passive:false});
+      n.addEventListener("click",handle);
+      n.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();handle(e);}});
+    })($("o"+i));
+  }
+}
+
+function pick(el,chosen,correct){
+  if(answered)return;answered=true;
+  for(var i=0;i<4;i++){var t=$("o"+i);if(t.dataset.val===correct)t.classList.add("show");}
+  var fb=$("fb");
+  if(chosen===correct){
+    el.classList.add("ok");el.classList.remove("show");
+    C++;totalC++;streak++;
+    var gain=15+(streak>=3?5:0);lvXP+=gain;totalXP+=gain;
+    fb.textContent=streak>=3?"✓ "+streak+" streak! +"+gain+" XP":"✓ Correct!";fb.className="fbok";
+  } else {
+    el.classList.add("bad");W++;totalW++;streak=0;weak.push(cur);
+    fb.textContent="✗ Answer: "+correct;fb.className="fbbad";
+  }
+  showNote();updateStats();
+  $("nxt").style.display="block";
+}
+
+function updateBar(){$("lv").textContent=S().name+" · Level "+currentLevel+" / "+maxLevel();}
+function updateStats(){
+  $("sc").textContent=C;$("sr").textContent=weak.length;$("ss").textContent=streak;
+  var tot=C+W;$("sa").textContent=tot?Math.round(C/tot*100)+"%":"—";
+}
+function updateProg(){
+  var total=C+W+deck.length+weak.length+1;
+  $("prog").style.width=Math.round((C+W)/total*100)+"%";
+}
+
+function renderJumps(){
+  var h=$("levels");h.innerHTML="";
+  for(var n=1;n<=maxLevel();n++){(function(n){
+    var info=levelInfo(n);
+    var b=document.createElement("button");b.className="lvjump"+(n===currentLevel?" on":"");
+    b.textContent=info.emoji+" "+n;b.title=info.title;b.setAttribute("aria-label","Jump to level "+n+": "+info.title);
+    b.addEventListener("click",function(){startLevel(n);});
+    h.appendChild(b);
+  })(n);}
+  $("lvname").textContent=levelInfo(currentLevel).emoji+" "+levelInfo(currentLevel).title;
+}
+
+function showLevelSummary(){
+  hideAll();$("retry-bar").style.display="none";
+  var info=levelInfo(currentLevel),tot=C+W,last=currentLevel>=maxLevel();
+  $("ls-emoji").textContent=info.emoji;
+  $("ls-tag").textContent=S().name+" Level "+currentLevel+" Complete!";
+  $("ls-title").textContent=info.title;
+  $("ls-c").textContent=C;$("ls-w").textContent=W;
+  $("ls-acc").textContent=tot?Math.round(C/tot*100)+"%":"—";
+  $("ls-xp").textContent=lvXP;
+  $("ls-unlock").textContent=last?"You've finished every "+S().name+" level!":"Level "+(currentLevel+1)+" unlocked: "+levelInfo(currentLevel+1).title+"!";
+  $("ls-next").textContent=last?"See final results 🏆":"Start Level "+(currentLevel+1)+" →";
+  $("prog").style.width="100%";
+  $("level-summary").style.display="flex";
+}
+
+function showFinalDone(){
+  hideAll();$("done").style.display="flex";
+  var tot=totalC+totalW;
+  $("dc1").textContent=totalC;$("dc2").textContent=totalW;
+  $("dc3").textContent=tot?Math.round(totalC/tot*100)+"%":"—";
+  $("dc4").textContent=totalXP;
+  $("dsub").textContent="All "+maxLevel()+" "+S().name+" levels cleared! Pick another subject at the top, or go again.";
+  $("prog").style.width="100%";
+}
+
+function wire(id,fn){
+  var el=$(id);if(!el)return;
+  el.addEventListener("touchend",function(e){e.preventDefault();fn();},{passive:false});
+  el.addEventListener("click",fn);
+}
+
+wire("nxt",next);
+wire("ls-next",function(){if(currentLevel>=maxLevel())showFinalDone();else startLevel(currentLevel+1);});
+wire("ls-retry",function(){startLevel(currentLevel);});
+wire("d-again",function(){totalC=0;totalW=0;totalXP=0;startLevel(1);});
+
+// ── teacher editor (shows the current subject's questions) ──
+var snapshot=null;
+wire("teacher-toggle",function(){
+  if($("teacher-view").style.display==="flex"){DATA=snapshot||DATA;snapshot=null;showQuiz();}else{showTeacher();}
+});
+function showQuiz(){$("quiz-view").style.display="flex";$("teacher-view").style.display="none";}
+function showTeacher(){
+  snapshot=copyData(DATA);
+  $("quiz-view").style.display="none";$("teacher-view").style.display="flex";
+  renderEditor();
+}
+wire("tv-save",function(){saveData();snapshot=null;showQuiz();totalC=0;totalW=0;totalXP=0;startLevel(currentLevel);});
+wire("tv-cancel",function(){DATA=snapshot||DATA;snapshot=null;showQuiz();});
+var resetArmed=false;
+wire("tv-reset",function(){
+  var b=$("tv-reset");
+  if(!resetArmed){resetArmed=true;b.textContent="Tap again to restore";setTimeout(function(){resetArmed=false;b.textContent="Restore defaults";},3000);return;}
+  resetArmed=false;b.textContent="Restore defaults";
+  DATA=copyData(DEFAULT_DATA);renderEditor();
+});
+
+function renderEditor(){
+  $("tv-title").textContent="✏ "+S().name+" questions";
+  var list=$("qlist");list.innerHTML="";var shown=0;
+  DATA.forEach(function(d,i){if(d.s===currentSubj){shown++;renderCard(d,i,shown,list);}});
+}
+
+function pillRow(label,values,labelFor,isActive,onPick){
+  var w=document.createElement("div");w.innerHTML='<div class="field-label">'+label+'</div>';
+  var row=document.createElement("div");row.className="pills";
+  values.forEach(function(v){
+    var p=document.createElement("div");p.className="pill"+(isActive(v)?" active":"");p.textContent=labelFor(v);
+    p.addEventListener("click",function(){onPick(v);row.querySelectorAll(".pill").forEach(function(x){x.classList.remove("active");});p.classList.add("active");});
+    row.appendChild(p);
+  });
+  w.appendChild(row);return w;
+}
+
+function renderCard(d,i,num,list){
+  var wrap=document.createElement("div");wrap.className="qcard";
+  var hdr=document.createElement("div");hdr.className="qcard-header";
+  hdr.innerHTML='<span class="qcard-num">Q'+num+'</span><span class="qcard-preview">'+escHtml(d.q)+'</span><span class="qcard-lv">Lv '+d.lv+'</span><button class="qcard-del">Delete</button>';
+  wrap.appendChild(hdr);
+  var body=document.createElement("div");body.className="qcard-body";
+  var lvs=[];for(var n=1;n<=maxLevel();n++)lvs.push(n);
+  body.appendChild(pillRow("Level",lvs,function(n){return n+". "+levelInfo(n).title;},function(n){return d.lv===n;},function(n){d.lv=n;hdr.querySelector(".qcard-lv").textContent="Lv "+n;}));
+  body.appendChild(pillRow("Type",S().types,function(t){return BADGES[t][1];},function(t){return d.t===t;},function(t){d.t=t;}));
+  body.appendChild(makeField("Question (or term, for terminology)",d.q,function(v){d.q=v;hdr.querySelector(".qcard-preview").textContent=v;}));
+  body.appendChild(makeField("Correct answer (or definition, for terminology)",d.a,function(v){d.a=v;}));
+
+  var ob=document.createElement("div");
+  ob.innerHTML='<div class="field-label" style="margin-bottom:6px">Wrong options (3)</div><div class="hint" style="margin-bottom:6px">Terminology cards ignore these: their wrong options come from the other terms in this subject.</div>';
+  var og=document.createElement("div");og.className="opts-grid";
+  for(var j=0;j<3;j++){(function(j){
+    var inp=document.createElement("input");inp.className="field-input";inp.type="text";inp.value=(d.x&&d.x[j])||"";
+    inp.setAttribute("aria-label","Wrong option "+(j+1));
+    inp.addEventListener("input",function(){if(!d.x)d.x=[];d.x[j]=inp.value;});
+    og.appendChild(inp);
+  })(j);}
+  ob.appendChild(og);body.appendChild(ob);
+  body.appendChild(makeTextarea("Explanation shown after answering",d.note||"",function(v){d.note=v;}));
+  wrap.appendChild(body);
+
+  hdr.addEventListener("click",function(e){if(e.target.classList.contains("qcard-del"))return;body.classList.toggle("open");});
+  var del=hdr.querySelector(".qcard-del"),armed=false;
+  del.addEventListener("click",function(e){
+    e.stopPropagation();
+    if(!armed){armed=true;del.textContent="Sure?";setTimeout(function(){armed=false;del.textContent="Delete";},3000);return;}
+    DATA.splice(i,1);renderEditor();
+  });
+  list.appendChild(wrap);
+}
+
+function makeField(label,val,onChange){
+  var w=document.createElement("div");
+  var l=document.createElement("div");l.className="field-label";l.textContent=label;
+  var inp=document.createElement("input");inp.className="field-input";inp.type="text";inp.value=val;
+  inp.addEventListener("input",function(){onChange(inp.value);});
+  w.appendChild(l);w.appendChild(inp);return w;
+}
+function makeTextarea(label,val,onChange){
+  var w=document.createElement("div");
+  var l=document.createElement("div");l.className="field-label";l.textContent=label;
+  var ta=document.createElement("textarea");ta.className="field-input";ta.value=val;ta.rows=3;
+  ta.addEventListener("input",function(){onChange(ta.value);});
+  w.appendChild(l);w.appendChild(ta);return w;
+}
+
+wire("add-btn",function(){
+  DATA.push({s:currentSubj,lv:currentLevel,t:S().types[0],q:"New question",a:"Correct answer",x:["Wrong 1","Wrong 2","Wrong 3"],note:""});
+  renderEditor();
+  var cards=document.querySelectorAll(".qcard-body");
+  if(cards.length)cards[cards.length-1].classList.add("open");
+  $("tv-scroll").scrollTop=999999;
+});
+
+function escHtml(s){return(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+// ── start ──
+(function(){
+  var saved=null;try{saved=localStorage.getItem(SUBJ_KEY);}catch(e){}
+  var hash=(location.hash||"").replace("#","");
+  currentSubj=SUBJECTS[hash]?hash:(SUBJECTS[saved]?saved:"bio");
+  applyTheme();renderSubjects();startLevel(1);
+})();
+</script>
+</body>
+</html>
